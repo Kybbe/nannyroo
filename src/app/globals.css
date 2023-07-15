@@ -3,4 +3,6 @@
 @tailwind utilities;
 
 body {
+  --fc-today-bg-color: #E5FFFC !important;
+  --fc-event-bg-color: #387879;
 }
