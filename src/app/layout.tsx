@@ -1,23 +1,33 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { NextAuthProvider } from "@/components/Layout/Provider";
+import "./globals.css";
+import type { Metadata } from "next";
+import { Nunito } from "next/font/google";
+import Header from "@/components/Layout/Header";
 
-const inter = Inter({ subsets: ['latin'] })
+const nunito = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'SitterSync',
-  description: "Schedule for children's habits to help nannys keep track of those habits.",
-  themeColor: "#E5FFFC",
-}
+	title: "SitterSync",
+	description:
+		"Schedule for children's habits, to help guardians share those habits with nannys.",
+	themeColor: "#E5FFFC",
+};
 
 export default function RootLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode
+	children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
+	return (
+		<html lang="en">
+			<body
+				className={`${nunito.className} bg-primaryBackground dark:bg-primaryDark text-primaryDark dark:text-primaryBackground min-h-screen flex flex-col`}
+			>
+				<NextAuthProvider>
+					<Header />
+					{children}
+				</NextAuthProvider>
+			</body>
+		</html>
+	);
 }
