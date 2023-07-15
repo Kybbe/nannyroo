@@ -1,3 +1,82 @@
 {
-  "extends": "next/core-web-vitals"
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"react-app",
+		"airbnb",
+		"plugin:jsx-a11y/recommended",
+		"prettier",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react/jsx-runtime"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"settings": {
+		"import/resolver": {
+			"typescript": {}
+		}
+	},
+	"plugins": ["@typescript-eslint", "jsx-a11y", "prettier", "testing-library"],
+	"rules": {
+		"testing-library/await-async-query": "error",
+		"react/no-unescaped-entities": "off",
+		"testing-library/no-await-sync-query": "error",
+		"testing-library/no-debugging-utils": "warn",
+		"testing-library/no-dom-import": "off",
+		"@typescript-eslint/no-use-before-define": ["error"],
+		"@typescript-eslint/no-shadow": ["error"],
+		"semi": 1,
+		"no-console": "off",
+		"no-underscore-dangle": "off",
+		"no-nested-ternary": "off",
+		"import/prefer-default-export": "off",
+		"no-return-assign": "off",
+		"no-shadow": "off",
+		"react/jsx-props-no-spreading": "off",
+		"react/prop-types": 0,
+		"no-param-reassign": "off",
+		"jsx-a11y/media-has-caption": "off",
+		"react/no-this-in-sfc": "off",
+		"react/function-component-definition": "off",
+		"react/react-in-jsx-scope": "off",
+		"no-use-before-define": 0,
+		"react/require-default-props": 0,
+		"react/jsx-filename-extension": [
+			1,
+			{ "extensions": [".js", ".jsx", ".ts", ".tsx"] }
+		],
+		"prettier/prettier": [
+			"error",
+			{
+				"trailingComma": "es5",
+				"tabWidth": 2,
+				"semi": true,
+				"singleQuote": false,
+				"endOfLine": "auto",
+				"useTabs": true,
+				"bracketSpacing": true,
+				"bracketSameLine": false,
+				"arrowParens": "avoid"
+			}
+		],
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{ "js": "never", "jsx": "never", "ts": "never", "tsx": "never" }
+		],
+		"import/no-extraneous-dependencies": [
+			"error",
+			{ "devDependencies": ["**/*.test.tsx", "**/setupTests.ts"] }
+		],
+		"react/jsx-no-useless-fragment": ["error", { "allowExpressions": true }]
+	}
 }
