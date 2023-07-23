@@ -14,12 +14,11 @@ interface ScheduleEvent {
 	groupId?: string;
 	startTime?: string;
 	endTime?: string;
-	startRecur?: Date;
-	endRecur?: Date;
+	startRecur?: string;
+	endRecur?: string;
 
 	extendedProps?: {
 		notes?: string;
-		description?: string;
 		place?: string;
 		completed?: boolean;
 	};
