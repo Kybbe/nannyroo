@@ -1,0 +1,23 @@
+.PopoverContent[data-state="open"][data-side="bottom"] {
+  animation: slideUpAndFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes slideUpAndFade {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+.PopoverArrow {
+  transform: scale(3);
+  fill: #d8e5f5;
+
+  body.dark & {
+    fill: #1E293B;
+  }
+}
