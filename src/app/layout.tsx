@@ -22,7 +22,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${nunito.className} bg-primaryBackground dark:bg-primaryDark text-primaryDark dark:text-primaryBackground min-h-screen flex flex-col`}
+				className={`${nunito.className} bg-neutral-50 dark:bg-neutral-950 text-primaryDark dark:text-primaryBackground min-h-screen flex flex-col`}
 			>
 				<ReduxStoreProvider>
 					<NextAuthProvider>

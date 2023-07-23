@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Home() {
 	const { data: session } = useSession();
 	return (
-		<main className="flex bg-primaryBackground dark:bg-primaryDark text-primaryDark dark:text-primaryBackground flex-col items-center p-2 sm:p-24">
+		<main className="flex flex-col items-center p-2 sm:p-24">
 			<div className="flex flex-col items-center gap-4">
 				<h1 className="text-6xl font-bold text-center">SitterSync</h1>
 				<h3 className="text-4xl font-bold text-center">
