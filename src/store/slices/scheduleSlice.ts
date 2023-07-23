@@ -17,14 +17,14 @@ const scheduleSlice = createSlice({
 			state.schedule.events.push(action.payload);
 		},
 		updateEvent: (state, action) => {
-			const event = state.schedule.events.find(e => e.id === action.payload.id);
-			if (event) {
-				Object.assign(event, action.payload);
-			}
+			const eventIndex = state.schedule.events.findIndex(
+				event => event.id === action.payload.id
+			);
+			state.schedule.events[eventIndex] = action.payload;
 		},
 		deleteEvent: (state, action) => {
 			state.schedule.events = state.schedule.events.filter(
-				event => event.id !== action.payload.id
+				event => event.id !== action.payload
 			);
 		},
 	},
