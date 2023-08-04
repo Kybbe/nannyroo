@@ -8,8 +8,11 @@ import { useEffect, useState } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { formatDate, formatTime } from "@/helpers/DateFormat";
+import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
+import saveToDatabase from "@/helpers/frontend/saveToDb";
 import styles from "./CreateEventPopover.module.scss";
+import ColorPicker from "../ColorPicker";
+import ScheduleSwitcher from "../ScheduleSwitcher";
 
 interface Props {
 	open: boolean;
@@ -34,10 +37,12 @@ export default function CreateEventPopover({
 	calendarRef,
 	setUndoStack,
 }: Props) {
-	const eventStore = useAppSelector(state => state.schedule.schedule);
+	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
+	const activeSchedule = useAppSelector(state => state.schedule.activeSchedule);
 	const dispatch = useAppDispatch();
 
-	const createEventId = () => String(eventStore.events.length + 1);
+	const createEventId = () =>
+		String(Math.round(Math.random() * 10000000000000));
 
 	const [showExtraOptions, setShowExtraOptions] = useState(false);
 
@@ -45,6 +50,7 @@ export default function CreateEventPopover({
 
 	const [data, setData] = useState({
 		title: "",
+		parentScheduleId: eventStore._id === "all" ? undefined : eventStore._id,
 		start: propStart || "",
 		end: propEnd || "",
 		startRecur: "",
@@ -54,8 +60,12 @@ export default function CreateEventPopover({
 		daysOfWeek: [],
 		notes: "",
 		place: "",
+		backgroundColor: "",
+		borderColor: "",
+		textColor: "",
 	} as {
 		title: string;
+		parentScheduleId?: string;
 		start: string;
 		end: string;
 		startRecur: string;
@@ -65,11 +75,15 @@ export default function CreateEventPopover({
 		daysOfWeek: { label: string; value: number }[];
 		notes: string;
 		place: string;
+		backgroundColor: string;
+		borderColor: string;
+		textColor: string;
 	});
 
 	useEffect(() => {
 		setData({
 			title: "",
+			parentScheduleId: eventStore._id === "all" ? undefined : eventStore._id,
 			start: propStart || "",
 			end: propEnd || "",
 			startRecur: "",
@@ -79,22 +93,82 @@ export default function CreateEventPopover({
 			daysOfWeek: [],
 			notes: "",
 			place: "",
+			backgroundColor: "",
+			borderColor: "",
+			textColor: "",
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open, propStart, propEnd]);
 
+	function createRecurringEvent(event: any) {
+		if (event.daysOfWeek?.length === 0) {
+			alert("Please select at least one day of the week");
+			return null;
+		}
+
+		const newEvent = {
+			id: createEventId(),
+			title: event.title,
+			parentScheduleId: event.parentScheduleId,
+			startTime: formatTime(event.start),
+			endTime: formatTime(event.end),
+			startRecur: event.startRecur,
+			endRecur: event.endRecur,
+			allDay: event.allDay,
+			groupId: event.title + event.start + event.end + event.allDay,
+			backgroundColor: event.backgroundColor,
+			borderColor: event.borderColor,
+			textColor: event.textColor,
+			extendedProps: {
+				notes: event.extendedProps?.notes,
+				place: event.extendedProps?.place,
+				completed: false,
+			},
+			daysOfWeek: event.daysOfWeek?.map((d: any) => d.value),
+		};
+
+		if (!newEvent.startRecur) delete newEvent.startRecur;
+		if (!newEvent.endRecur) delete newEvent.endRecur;
+		if (!newEvent.daysOfWeek) delete newEvent.daysOfWeek;
+
+		return newEvent as ScheduleEvent;
+	}
+
+	function createNormalEvent(event: any) {
+		const startFormatted = new Date(data.start);
+		const endFormatted = new Date(data.end);
+
+		// check if start is before end
+		if (startFormatted > endFormatted) {
+			alert("Start date must be before end date");
+			return null;
+		}
+
+		const ISOStart = startFormatted.toISOString();
+		const ISOEnd = endFormatted.toISOString();
+
+		const newEvent = {
+			id: createEventId(),
+			title: event.title,
+			parentScheduleId: event.parentScheduleId,
+			start: ISOStart,
+			end: ISOEnd,
+			allDay: event.allDay,
+			backgroundColor: event.backgroundColor,
+			borderColor: event.borderColor,
+			textColor: event.textColor,
+			extendedProps: {
+				notes: event.notes,
+				place: event.place,
+				completed: false,
+			},
+		};
+
+		return newEvent as ScheduleEvent;
+	}
+
 	function createEvent() {
-		const {
-			title,
-			allDay,
-			recurring,
-			daysOfWeek,
-			notes,
-			place,
-			start,
-			end,
-			startRecur,
-			endRecur,
-		} = data;
+		const { title, recurring } = data;
 		if (!calendarRef || !calendarRef.current) {
 			console.error("calendarRef is null");
 			return;
@@ -106,55 +180,13 @@ export default function CreateEventPopover({
 
 		let newEvent: ScheduleEvent;
 		if (recurring) {
-			if (daysOfWeek.length === 0) {
-				alert("Please select at least one day of the week");
-				return;
-			}
-
-			newEvent = {
-				id: createEventId(),
-				title,
-				startTime: formatTime(start),
-				endTime: formatTime(end),
-				startRecur,
-				endRecur,
-				allDay,
-				groupId: title + start + end + allDay,
-				extendedProps: {
-					notes,
-					place,
-					completed: false,
-				},
-				daysOfWeek: daysOfWeek.map(d => d.value),
-			};
-
-			if (!newEvent.startRecur) delete newEvent.startRecur;
-			if (!newEvent.endRecur) delete newEvent.endRecur;
+			const res = createRecurringEvent(data);
+			if (!res) return;
+			newEvent = res;
 		} else {
-			const startFormatted = new Date(data.start);
-			const endFormatted = new Date(data.end);
-
-			// check if start is before end
-			if (startFormatted > endFormatted) {
-				alert("Start date must be before end date");
-				return;
-			}
-
-			const ISOStart = startFormatted.toISOString();
-			const ISOEnd = endFormatted.toISOString();
-
-			newEvent = {
-				id: createEventId(),
-				title,
-				start: ISOStart,
-				end: ISOEnd,
-				allDay,
-				extendedProps: {
-					notes,
-					place,
-					completed: false,
-				},
-			};
+			const res = createNormalEvent(data);
+			if (!res) return;
+			newEvent = res;
 		}
 
 		dispatch(createStoreEvent(newEvent));
@@ -165,7 +197,22 @@ export default function CreateEventPopover({
 				action: "add",
 			},
 		]);
+		console.info("New event", newEvent);
+		saveToDatabase(
+			newEvent,
+			newEvent.parentScheduleId || activeSchedule._id,
+			"event",
+			"POST"
+		);
 		onOpenChange(false);
+	}
+
+	function setColor(color: {
+		textColor: string;
+		backgroundColor: string;
+		borderColor: string;
+	}) {
+		setData({ ...data, ...color });
 	}
 
 	return (
@@ -178,7 +225,7 @@ export default function CreateEventPopover({
 			<Popover.Anchor style={{ position: "absolute", left: x, top: y }} />
 			<Popover.Portal>
 				<Popover.Content
-					className={`${styles.PopoverContent} rounded p-4 bg-slate-200 dark:bg-gray-800 shadow-md z-10`}
+					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10`}
 					sideOffset={5}
 				>
 					<form
@@ -194,6 +241,18 @@ export default function CreateEventPopover({
 						>
 							Create event
 						</p>
+						<fieldset className="Fieldset flex gap-5 items-center">
+							<label className="Label w-20" htmlFor="parentScheduleId">
+								Schedule
+							</label>
+							<ScheduleSwitcher
+								value={data.parentScheduleId}
+								onValueChange={(v: string) => {
+									setData({ ...data, parentScheduleId: v });
+								}}
+								showAll={false}
+							/>
+						</fieldset>
 						<fieldset className="Fieldset flex gap-5 items-center">
 							<label className="Label w-20" htmlFor="Title">
 								Title
@@ -342,6 +401,16 @@ export default function CreateEventPopover({
 								</fieldset>
 							</>
 						)}
+						<ColorPicker
+							color={{
+								textColor: data.textColor,
+								backgroundColor: data.backgroundColor,
+								borderColor: data.borderColor,
+							}}
+							setColor={c => {
+								setColor(c);
+							}}
+						/>
 						<button
 							type="button"
 							className="border-b-2 border-teal-700 border-solid transition-colors px-4 py-2 text-sm font-bold"
@@ -400,7 +469,7 @@ export default function CreateEventPopover({
 						</div>
 					</form>
 					<Popover.Close
-						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center"
+						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
 						aria-label="Close"
 					>
 						X

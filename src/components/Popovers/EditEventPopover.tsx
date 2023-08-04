@@ -10,8 +10,11 @@ import {
 	deleteEvent,
 	updateEvent as editStoreEvent,
 } from "@/store/slices/scheduleSlice";
-import { formatDate, formatTime } from "@/helpers/DateFormat";
+import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
+import saveToDatabase from "@/helpers/frontend/saveToDb";
+import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 import styles from "./EditEventPopover.module.scss";
+import ColorPicker from "../ColorPicker";
 
 interface Props {
 	open: boolean;
@@ -30,7 +33,8 @@ export default function EditEventPopover({
 	event,
 	setUndoStack,
 }: Props) {
-	const eventStore = useAppSelector(state => state.schedule.schedule);
+	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
+	const flattenedWriteableEvents = UseGetAllWriteableEvents();
 	const dispatch = useAppDispatch();
 
 	const [showExtraOptions, setShowExtraOptions] = useState(false);
@@ -50,6 +54,9 @@ export default function EditEventPopover({
 		recurring: event?.daysOfWeek?.length !== 0 || false,
 		startRecur: event?.startRecur || "",
 		endRecur: event?.endRecur || "",
+		backgroundColor: event?.backgroundColor,
+		borderColor: event?.borderColor,
+		textColor: event?.textColor,
 		daysOfWeek:
 			event?.daysOfWeek?.map(d => ({
 				label: [
@@ -77,6 +84,9 @@ export default function EditEventPopover({
 			start: formatDate(event?.start) || event?.startTime || "",
 			end: formatDate(event?.end) || event?.endTime || "",
 			allDay: event?.allDay || false,
+			backgroundColor: event?.backgroundColor,
+			borderColor: event?.borderColor,
+			textColor: event?.textColor,
 			recurring: isRecurring,
 			startRecur: event?.startRecur || "",
 			endRecur: event?.endRecur || "",
@@ -105,7 +115,7 @@ export default function EditEventPopover({
 
 	const saveEvent = () => {
 		const id = event?.id;
-		const storeEvent = eventStore.events.find(e => e.id === id);
+		const storeEvent = flattenedWriteableEvents?.find(e => e.id === id);
 		if (!storeEvent) return;
 
 		let ISOStart = data.start;
@@ -130,6 +140,7 @@ export default function EditEventPopover({
 		if (data.recurring) {
 			newEvent = {
 				id: storeEvent.id,
+				parentScheduleId: storeEvent.parentScheduleId,
 				title: data.title,
 				startTime: ISOStart,
 				endTime: ISOEnd,
@@ -137,6 +148,9 @@ export default function EditEventPopover({
 				endRecur: data.endRecur,
 				allDay: data.allDay,
 				daysOfWeek: data.daysOfWeek.map(d => d.value),
+				backgroundColor: data.backgroundColor,
+				borderColor: data.borderColor,
+				textColor: data.textColor,
 				groupId:
 					storeEvent.groupId ||
 					data.title + data.start + data.end + data.allDay,
@@ -155,10 +169,14 @@ export default function EditEventPopover({
 		} else {
 			newEvent = {
 				id: storeEvent.id,
+				parentScheduleId: storeEvent.parentScheduleId,
 				title: data.title,
 				start: ISOStart,
 				end: ISOEnd,
 				allDay: data.allDay,
+				backgroundColor: data.backgroundColor,
+				borderColor: data.borderColor,
+				textColor: data.textColor,
 				extendedProps: {
 					...storeEvent.extendedProps,
 					notes: data.notes,
@@ -176,8 +194,17 @@ export default function EditEventPopover({
 				oldEvent: storeEvent,
 			},
 		]);
+		saveToDatabase(newEvent, storeEvent.parentScheduleId, "event", "PUT");
 		onOpenChange(false);
 	};
+
+	function setColor(color: {
+		textColor: string;
+		backgroundColor: string;
+		borderColor: string;
+	}) {
+		setData({ ...data, ...color });
+	}
 
 	return (
 		<Popover.Root
@@ -189,7 +216,7 @@ export default function EditEventPopover({
 			<Popover.Anchor style={{ position: "absolute", left: x, top: y }} />
 			<Popover.Portal>
 				<Popover.Content
-					className={`${styles.PopoverContent} rounded p-4 bg-slate-200 dark:bg-gray-800 shadow-md z-10`}
+					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10`}
 					sideOffset={5}
 				>
 					<form
@@ -366,6 +393,16 @@ export default function EditEventPopover({
 								</fieldset>
 							</>
 						)}
+						<ColorPicker
+							color={{
+								textColor: data.textColor || "",
+								backgroundColor: data.backgroundColor || "",
+								borderColor: data.borderColor || "",
+							}}
+							setColor={c => {
+								setColor(c);
+							}}
+						/>
 						<button
 							type="button"
 							className="border-b-2 border-teal-700 border-solid transition-colors px-4 py-2 text-sm font-bold"
@@ -441,7 +478,7 @@ export default function EditEventPopover({
 						</div>
 					</form>
 					<Popover.Close
-						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center"
+						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
 						aria-label="Close"
 					>
 						X
