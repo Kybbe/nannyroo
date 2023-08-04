@@ -11,6 +11,7 @@ import {
 } from "@fullcalendar/core";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import { updateEvent as editStoreEvent } from "@/store/slices/scheduleSlice";
@@ -22,7 +23,6 @@ import saveToDatabase from "@/helpers/frontend/saveToDb";
 import UseGetAllFlattenedEvents from "@/hooks/UseGetAllFlattenedEvents";
 import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 import { useAuthContext } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
 export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);

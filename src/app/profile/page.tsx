@@ -9,9 +9,9 @@ import {
 } from "firebase/auth";
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 import signUp, { signIn } from "@/helpers/frontend/firebase/Auth";
 import { useAuthContext } from "@/context/AuthContext";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 const provider = new GoogleAuthProvider();
 
