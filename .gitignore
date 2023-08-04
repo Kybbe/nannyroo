@@ -33,3 +33,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+src/helpers/sittersync-firebase-adminsdk-j5zgq-f40209e460.json
+src/helpers/backend/firebase/sittersync-firebase-adminsdk-j5zgq-f40209e460.json
