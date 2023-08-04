@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+
 "use client";
 
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -9,104 +11,69 @@ import {
 	EventChangeArg,
 	EventClickArg,
 } from "@fullcalendar/core";
-import { EventImpl } from "@fullcalendar/core/internal";
-
-interface UndoStack {
-	id: string;
-	action: "add" | "delete" | "edit";
-	undoFunc?: () => void;
-	oldEvent?: Event | EventImpl;
-}
-
-interface Event {
-	id: string;
-	title: string;
-	start?: Date;
-	end?: Date;
-
-	backgroundColor?: string;
-	borderColor?: string;
-	textColor?: string;
-
-	daysOfWeek?: number[];
-	groupId?: string;
-	startTime?: string;
-	endTime?: string;
-	startRecur?: Date;
-	endRecur?: Date;
-
-	extendedProps?: {
-		notes?: string;
-		description?: string;
-		place?: string;
-		completed?: boolean;
-	};
-}
-
-interface EventStore {
-	events: Event[];
-}
+import { useAppSelector } from "@/hooks/redux/useAppSelector";
+import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
+import {
+	addEvent as addStoreEvent,
+	deleteEvent as deleteStoreEvent,
+	updateEvent as editStoreEvent,
+} from "@/store/slices/scheduleSlice";
+import CreateEventPopover from "@/components/Popovers/CreateEventPopover";
+import EditEventPopover from "@/components/Popovers/EditEventPopover";
+import { formatTime } from "@/helpers/frontend/DateFormat";
+import * as Checkbox from "@radix-ui/react-checkbox";
+import { CheckIcon } from "@radix-ui/react-icons";
+import ScheduleEditor from "@/components/ScheduleEditor";
+import saveToDatabase from "@/helpers/frontend/saveToDb";
+import { useAuthContext } from "@/context/AuthContext";
+import UseGetAllFlattenedEvents from "@/hooks/UseGetAllFlattenedEvents";
+import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 
 export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
-	const [eventStore, setEventStore] = useState<EventStore>({
-		events: [
-			{
-				id: "1",
-				title: "Event 1",
-				start: new Date(),
-				end: new Date(Date.now() + 1000 * 60 * 60 * 1),
-				borderColor: "lightgray",
-				backgroundColor: "#e6e89a",
-			},
-			{
-				id: "2",
-				title: "Recurring event",
-				backgroundColor: "#e6e89a",
-				groupId: "Recurrence",
-				daysOfWeek: [1, 4],
-				startTime: "10:00",
-				endTime: "11:00",
-			},
-		],
-	});
-	const [undoStack, setUndoStack] = useState<UndoStack[]>([]); // [{event, action}
+	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
+	const allSchedules = useAppSelector(state => state.schedule.schedules);
+	const flattenedEvents = UseGetAllFlattenedEvents();
+	const flattenedWriteableEvents = UseGetAllWriteableEvents();
+
+	const [undoStack, setUndoStack] = useState<UndoStack[]>([]);
+
+	const [createModalOpen, setCreateModalOpen] = useState<
+		| false
+		| { x: number; y: number; start: string; end: string; allDay: boolean }
+	>(false);
+
+	const [editModalOpen, setEditModalOpen] = useState<
+		false | { x: number; y: number; event: ScheduleEvent }
+	>(false);
+
+	const dispatch = useAppDispatch();
+	const shouldLookDisabled =
+		allSchedules.ownerSchedules.length === 0 &&
+		allSchedules.sharedSchedules.length === 0;
 
 	const createEvent = (selectInfo: DateSelectArg) => {
-		const title = prompt("Please enter a new title for your event");
-		if (!calendarRef.current) {
-			console.error("calendarRef is null");
-			return;
-		}
-		const calendarApi = calendarRef.current.getApi();
-
-		calendarApi.unselect(); // clear date selection
-
-		if (title) {
-			calendarApi.addEvent({
-				id: createEventId(),
-				title,
-				start: selectInfo.startStr,
-				end: selectInfo.endStr,
-				allDay: selectInfo.allDay,
-			});
-		}
+		if (!selectInfo.jsEvent) return;
+		setCreateModalOpen({
+			x: selectInfo.jsEvent.clientX,
+			y: selectInfo.jsEvent.clientY,
+			start: selectInfo.start?.toISOString(),
+			end: selectInfo.end?.toISOString(),
+			allDay: selectInfo.allDay,
+		});
 	};
 
-	const deleteEvent = (clickInfo: EventClickArg) => {
-		if (
-			// eslint-disable-next-line no-restricted-globals
-			confirm(
-				`Are you sure you want to delete the event '${clickInfo.event.title}'`
-			)
-		) {
-			const { id } = clickInfo.event;
-			clickInfo.event.remove();
-			setUndoStack([
-				...undoStack,
-				{ id, action: "delete", oldEvent: clickInfo.event },
-			]);
-		}
+	const openEditModal = (clickInfo: EventClickArg) => {
+		const storeEvent = flattenedWriteableEvents?.find(
+			e => e.id === clickInfo.event.id
+		);
+		if (!storeEvent) return;
+
+		setEditModalOpen({
+			x: clickInfo.jsEvent.clientX,
+			y: clickInfo.jsEvent.clientY,
+			event: storeEvent as ScheduleEvent,
+		});
 	};
 
 	const editEvent = (changeInfo: EventChangeArg) => {
@@ -114,29 +81,31 @@ export default function Schedule() {
 			console.error("calendarRef is null");
 			return;
 		}
-		const event = eventStore.events.find(e => e.id === changeInfo.event.id);
+		const event = flattenedWriteableEvents?.find(
+			e => e.id === changeInfo.event.id
+		);
 		if (!event) return;
 
-		let newEvent: Event;
+		let newEvent: ScheduleEvent;
 
 		if (changeInfo.event.groupId) {
 			newEvent = {
 				...event,
 				startTime: changeInfo.event.startStr.split("T")[1].slice(0, 5),
 				endTime: changeInfo.event.endStr.split("T")[1].slice(0, 5),
+				allDay: changeInfo.event.allDay,
 			};
 		} else {
 			newEvent = {
 				...event,
-				start: changeInfo.event.start as Date,
-				end: changeInfo.event.end as Date,
+				start: changeInfo.event.start?.toISOString(),
+				end: changeInfo.event.end?.toISOString(),
+				allDay: changeInfo.event.allDay,
 			};
 		}
 
-		setEventStore({
-			...eventStore,
-			events: eventStore.events.map(e => (e.id === newEvent.id ? newEvent : e)),
-		});
+		dispatch(editStoreEvent(newEvent));
+		saveToDatabase(newEvent, newEvent.parentScheduleId, "event", "PUT");
 
 		setUndoStack([
 			...undoStack,
@@ -149,9 +118,78 @@ export default function Schedule() {
 		]);
 	};
 
-	const createEventId = () => String(eventStore.events.length + 1);
+	const completeEvent = (id: string, completed: boolean) => {
+		const event = eventStore.events.find(e => e.id === id);
+		if (!event) return;
 
-	useEffect(() => {
+		const newEvent = {
+			...event,
+			extendedProps: {
+				...event.extendedProps,
+				completed,
+			},
+		};
+
+		dispatch(editStoreEvent(newEvent));
+		saveToDatabase(newEvent, newEvent.parentScheduleId, "event", "PUT");
+	};
+
+	const renderEventContent = (eventInfo: any) => {
+		const { event } = eventInfo;
+		const {
+			id,
+			groupId,
+			start,
+			end,
+			allDay,
+			title,
+			startTime,
+			endTime,
+			extendedProps: { notes, place, completed },
+		} = event;
+		return (
+			<>
+				<Checkbox.Root
+					style={completed ? { opacity: 0.5 } : {}}
+					className="bg-white text-black inline-flex items-center justify-center rounded-sm px-2 h-5 w-5"
+					checked={completed}
+					defaultChecked={completed}
+					onCheckedChange={(e: boolean) => {
+						completeEvent(id, e);
+					}}
+					onClick={e => {
+						e.stopPropagation();
+					}}
+				>
+					<Checkbox.Indicator className="CheckboxIndicator">
+						<CheckIcon />
+					</Checkbox.Indicator>
+				</Checkbox.Root>
+				{allDay ? (
+					<p className="text-xs" style={completed ? { opacity: 0.5 } : {}}>
+						All day
+					</p>
+				) : (
+					<>
+						{Math.abs(new Date(start).getTime() - new Date(end).getTime()) >
+							1000 * 60 * 25 && (
+							<p
+								className="text-xs h-fit"
+								style={completed ? { opacity: 0.5 } : {}}
+							>
+								{formatTime(start)} - {formatTime(end)}
+							</p>
+						)}
+					</>
+				)}
+				<b className="h-fit" style={completed ? { opacity: 0.5 } : {}}>
+					{title}
+				</b>
+			</>
+		);
+	};
+
+	/* useEffect(() => {
 		const undo = () => {
 			if (undoStack.length === 0 || !undoStack) return;
 
@@ -163,31 +201,18 @@ export default function Schedule() {
 			if (action === "delete") {
 				if (!oldEvent) return;
 				calendarApi.addEvent(oldEvent);
+				dispatch(addStoreEvent(oldEvent));
 			} else if (action === "add") {
 				const event = eventStore.events.find(e => e.id === id);
 				calendarApi.removeEvent(event);
-				setEventStore({
-					...eventStore,
-					events: eventStore.events.filter(e => e.id !== id),
-				});
+				dispatch(deleteStoreEvent(id));
 			} else if (action === "edit") {
 				if (!undoFunc) return;
 				undoFunc();
 
 				if (!oldEvent) return;
 
-				const oldEventRevamped = {
-					...oldEvent,
-					start: oldEvent.start as Date,
-					end: oldEvent.end as Date,
-				} as Event;
-
-				setEventStore({
-					...eventStore,
-					events: eventStore.events.map(e =>
-						e.id === oldEvent.id ? oldEventRevamped : e
-					),
-				});
+				dispatch(editStoreEvent(oldEvent));
 			}
 			calendarApi.render();
 		};
@@ -198,7 +223,6 @@ export default function Schedule() {
 			}
 		};
 
-		// create listener for cmd+z or ctrl+z
 		document.addEventListener("keydown", e => {
 			checkUndo(e);
 		});
@@ -208,29 +232,115 @@ export default function Schedule() {
 				checkUndo(e);
 			});
 		};
-	}, [eventStore.events, undoStack]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [eventStore, undoStack]); */
+
+	useEffect(() => {
+		function goToCurrentTime() {
+			const currentTime = new Date().toLocaleTimeString("en-US", {
+				hour: "2-digit",
+				minute: "2-digit",
+				hour12: false,
+			});
+			calendarRef.current?.getApi().scrollToTime(currentTime);
+		}
+
+		goToCurrentTime();
+
+		const prevBtn = document.querySelector(
+			".fc-next-button.fc-button.fc-button-primary"
+		);
+		const nextBtn = document.querySelector(
+			".fc-prev-button.fc-button.fc-button-primary"
+		);
+		if (prevBtn && nextBtn) {
+			prevBtn.addEventListener("click", goToCurrentTime);
+			nextBtn.addEventListener("click", goToCurrentTime);
+
+			return () => {
+				prevBtn.removeEventListener("click", goToCurrentTime);
+				nextBtn.removeEventListener("click", goToCurrentTime);
+			};
+		}
+		return () => {
+			console.info("no prev or next btn");
+		};
+	}, []);
+
+	// create a variable to check if the user is on a mobile device
+	const isMobile = window.matchMedia("(max-width: 600px)").matches;
 
 	return (
-		<div className="flex flex-col items-center gap-4 flex-1 p-2">
-			<h1 className="text-xl text-center">Schedule</h1>
+		<div className="flex flex-col items-center gap-1 flex-1 sm:px-2">
+			<ScheduleEditor />
 
-			<div className="min-w-full min-h-full">
+			<CreateEventPopover
+				open={createModalOpen !== false}
+				onOpenChange={() => {
+					setCreateModalOpen(false);
+				}}
+				x={createModalOpen === false ? 0 : createModalOpen.x}
+				y={createModalOpen === false ? 0 : createModalOpen.y}
+				start={createModalOpen === false ? "" : createModalOpen.start}
+				end={createModalOpen === false ? "" : createModalOpen.end}
+				allDay={createModalOpen === false ? false : createModalOpen.allDay}
+				calendarRef={calendarRef}
+				setUndoStack={setUndoStack}
+			/>
+
+			<EditEventPopover
+				open={editModalOpen !== false}
+				onOpenChange={() => {
+					setEditModalOpen(false);
+				}}
+				x={editModalOpen === false ? 0 : editModalOpen.x}
+				y={editModalOpen === false ? 0 : editModalOpen.y}
+				event={editModalOpen === false ? undefined : editModalOpen.event}
+				setUndoStack={setUndoStack}
+			/>
+
+			<div className="relative min-w-full flex flex-1">
+				{shouldLookDisabled && (
+					<div className="absolute top-0 left-0 rounded-md w-full h-full bg-[#00000085] z-10 flex justify-center items-center">
+						<h1 className="text-4xl text-neutral-100">
+							You don't have any schedules yet! Create one to get started.
+						</h1>
+					</div>
+				)}
+
 				<FullCalendar
 					plugins={[timeGridPlugin, interactionPlugin]}
 					ref={calendarRef}
-					initialView="timeGridWeek"
+					slotDuration="00:15:00"
+					timeZoneParam="UTC"
+					weekNumberCalculation="ISO"
+					initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
 					headerToolbar={{
-						left: "prev,next",
+						left: "timeGridWeek,timeGridDay",
 						center: "title",
-						right: "timeGridWeek,timeGridDay",
+						right: "today prev,next",
 					}}
 					editable
 					selectable
-					events={eventStore && eventStore.events && eventStore.events.slice()}
-					select={createEvent}
-					/* eventContent={renderEventContent} */
-					eventClick={deleteEvent}
-					eventChange={editEvent}
+					events={
+						eventStore._id === "all" ? flattenedEvents : eventStore.events
+					}
+					select={e => {
+						if (shouldLookDisabled) return;
+						createEvent(e);
+					}}
+					eventContent={renderEventContent}
+					eventClick={e => {
+						if (shouldLookDisabled) return;
+						openEditModal(e);
+					}}
+					eventChange={e => {
+						if (shouldLookDisabled) return;
+						editEvent(e);
+					}}
+					expandRows
+					longPressDelay={300}
+					nowIndicator
 				/>
 			</div>
 		</div>
