@@ -61,7 +61,18 @@ const scheduleSlice = createSlice({
 			}
 		},
 		addEvent: (state, action) => {
-			state.activeSchedule.events.push(action.payload);
+			const flattenedSchedules = [
+				...state.schedules.ownerSchedules,
+				...state.schedules.sharedSchedules,
+			];
+			const parentSchedule = action.payload.parentScheduleId
+				? flattenedSchedules.find(
+						sch => sch._id === action.payload.parentScheduleId
+				  )
+				: flattenedSchedules.find(sch => sch._id === state.activeSchedule._id);
+			if (!parentSchedule) return;
+
+			parentSchedule.events.push(action.payload);
 		},
 		updateEvent: (state, action) => {
 			const flattenedSchedules = [
@@ -81,8 +92,19 @@ const scheduleSlice = createSlice({
 			parentSchedule.events[eventIndex] = action.payload;
 		},
 		deleteEvent: (state, action) => {
-			state.activeSchedule.events = state.activeSchedule.events.filter(
-				event => event.id !== action.payload
+			const flattenedSchedules = [
+				...state.schedules.ownerSchedules,
+				...state.schedules.sharedSchedules,
+			];
+			const parentSchedule = action.payload.parentScheduleId
+				? flattenedSchedules.find(
+						sch => sch._id === action.payload.parentScheduleId
+				  )
+				: flattenedSchedules.find(sch => sch._id === state.activeSchedule._id);
+			if (!parentSchedule) return;
+
+			parentSchedule.events = parentSchedule.events.filter(
+				event => event.id !== action.payload.id
 			);
 		},
 

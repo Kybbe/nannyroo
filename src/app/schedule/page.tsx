@@ -270,7 +270,7 @@ export default function Schedule() {
 	const isMobile = window.matchMedia("(max-width: 600px)").matches;
 
 	return (
-		<div className="flex flex-col items-center gap-1 flex-1 sm:px-2">
+		<div className="flex flex-col items-center gap-1 flex-1 px-1 sm:px-2 pt-2 max-h-[calc(100vh-96px)] sm:max-h-[calc(100vh-72px)] overflow-hidden">
 			<ScheduleEditor />
 
 			<CreateEventPopover

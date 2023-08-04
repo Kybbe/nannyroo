@@ -446,7 +446,13 @@ export default function EditEventPopover({
 								<button
 									type="button"
 									onClick={() => {
-										dispatch(deleteEvent(event?.id || ""));
+										dispatch(deleteEvent(event));
+										saveToDatabase(
+											event as ScheduleEvent,
+											event?.parentScheduleId,
+											"event",
+											"DELETE"
+										);
 										onOpenChange(false);
 									}}
 									className="border-red-700 border-2 border-solid text-red-700 hover:border-red-950 hover:text-red-950 transition-colors rounded-md px-4 py-2 text-sm font-bold"
