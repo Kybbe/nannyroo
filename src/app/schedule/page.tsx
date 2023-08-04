@@ -313,6 +313,11 @@ export default function Schedule() {
 					slotDuration="00:15:00"
 					timeZoneParam="UTC"
 					weekNumberCalculation="ISO"
+					slotLabelFormat={{
+						hour: "numeric",
+						minute: "2-digit",
+						hour12: false,
+					}}
 					initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
 					headerToolbar={{
 						left: "timeGridWeek,timeGridDay",
