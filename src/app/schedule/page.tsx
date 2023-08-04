@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-
 "use client";
 
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -23,6 +21,8 @@ import ScheduleEditor from "@/components/ScheduleEditor";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
 import UseGetAllFlattenedEvents from "@/hooks/UseGetAllFlattenedEvents";
 import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
+import { useAuthContext } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
@@ -30,6 +30,7 @@ export default function Schedule() {
 	const allSchedules = useAppSelector(state => state.schedule.schedules);
 	const flattenedEvents = UseGetAllFlattenedEvents();
 	const flattenedWriteableEvents = UseGetAllWriteableEvents();
+	const router = useRouter();
 
 	const [undoStack, setUndoStack] = useState<UndoStack[]>([]);
 
@@ -46,6 +47,43 @@ export default function Schedule() {
 	const shouldLookDisabled =
 		allSchedules.ownerSchedules.length === 0 &&
 		allSchedules.sharedSchedules.length === 0;
+
+	useEffect(() => {
+		function goToCurrentTime() {
+			const currentTime = new Date().toLocaleTimeString("en-US", {
+				hour: "2-digit",
+				minute: "2-digit",
+				hour12: false,
+			});
+			calendarRef.current?.getApi().scrollToTime(currentTime);
+		}
+
+		goToCurrentTime();
+
+		const prevBtn = document.querySelector(
+			".fc-next-button.fc-button.fc-button-primary"
+		);
+		const nextBtn = document.querySelector(
+			".fc-prev-button.fc-button.fc-button-primary"
+		);
+		if (prevBtn && nextBtn) {
+			prevBtn.addEventListener("click", goToCurrentTime);
+			nextBtn.addEventListener("click", goToCurrentTime);
+
+			return () => {
+				prevBtn.removeEventListener("click", goToCurrentTime);
+				nextBtn.removeEventListener("click", goToCurrentTime);
+			};
+		}
+		return () => {
+			console.info("no prev or next btn");
+		};
+	}, []);
+
+	const user = useAuthContext();
+	if (!user) {
+		router.push("/");
+	}
 
 	const createEvent = (selectInfo: DateSelectArg) => {
 		if (!selectInfo.jsEvent) return;
@@ -227,38 +265,6 @@ export default function Schedule() {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [eventStore, undoStack]); */
-
-	useEffect(() => {
-		function goToCurrentTime() {
-			const currentTime = new Date().toLocaleTimeString("en-US", {
-				hour: "2-digit",
-				minute: "2-digit",
-				hour12: false,
-			});
-			calendarRef.current?.getApi().scrollToTime(currentTime);
-		}
-
-		goToCurrentTime();
-
-		const prevBtn = document.querySelector(
-			".fc-next-button.fc-button.fc-button-primary"
-		);
-		const nextBtn = document.querySelector(
-			".fc-prev-button.fc-button.fc-button-primary"
-		);
-		if (prevBtn && nextBtn) {
-			prevBtn.addEventListener("click", goToCurrentTime);
-			nextBtn.addEventListener("click", goToCurrentTime);
-
-			return () => {
-				prevBtn.removeEventListener("click", goToCurrentTime);
-				nextBtn.removeEventListener("click", goToCurrentTime);
-			};
-		}
-		return () => {
-			console.info("no prev or next btn");
-		};
-	}, []);
 
 	// create a variable to check if the user is on a mobile device
 	const isMobile = window.matchMedia("(max-width: 600px)").matches;

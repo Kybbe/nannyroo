@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
 import { useAuthContext } from "@/context/AuthContext";
 
 export default function LoginLogoutBtn() {
 	const user = useAuthContext();
+	const router = useRouter();
 
 	if (user) {
 		return (
@@ -36,7 +37,7 @@ export default function LoginLogoutBtn() {
 		<button
 			type="button"
 			onClick={() => {
-				Router.push("/profile");
+				router.push("/profile");
 			}}
 			className="hover:underline font-bold"
 		>

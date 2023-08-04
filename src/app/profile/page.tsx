@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useState } from "react";
 import signUp, { signIn } from "@/helpers/frontend/firebase/Auth";
 import { useAuthContext } from "@/context/AuthContext";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 const provider = new GoogleAuthProvider();
 
@@ -155,7 +156,7 @@ export default function Profile() {
 				Welcome back, {user.displayName || user.email}!
 			</h2>
 
-			<p className="text-l text-center">{user?.email}</p>
+			{user.displayName && <p className="text-l text-center">{user?.email}</p>}
 
 			<label htmlFor="notis" className="flex flex-row items-center gap-2 mt-4">
 				I would like notfications when tasks are completed by others{" "}
@@ -166,10 +167,6 @@ export default function Profile() {
 					className="cursor-pointer h-4 w-4"
 				/>
 			</label>
-
-			<Link href="/schedule" className="hover:underline">
-				Go to schedule
-			</Link>
 
 			<button
 				className="bg-primaryDark text-primaryBackground rounded-lg px-4 py-2 hover:bg-teal-800 hover:text-neutral-100 transition-colors"
@@ -191,6 +188,19 @@ export default function Profile() {
 			>
 				Reset password
 			</button>
+
+			<Link
+				href="/schedule"
+				className="hover:underline mt-20 text-xl flex flex-row justify-center items-center gap-2 hover:gap-4 transition-all"
+			>
+				Go to schedule
+				<ArrowRightIcon
+					style={{
+						height: "1.5em",
+						width: "1.5em",
+					}}
+				/>
+			</Link>
 		</div>
 	);
 }
