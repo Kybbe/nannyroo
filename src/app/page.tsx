@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 import { ArrowRightIcon, DividerHorizontalIcon } from "@radix-ui/react-icons";
 import { useAuthContext } from "@/context/AuthContext";
 
 export default function Home() {
 	const user = useAuthContext();
+	const Router = useRouter();
+
 	return (
 		<main className="flex flex-col items-center p-2 sm:p-24">
 			<div className="flex flex-col items-center gap-4">
