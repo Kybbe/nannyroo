@@ -7,9 +7,14 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	// cors
-	// atuhorization
 	// logger
+
+	// cors
+	res.setHeader("Access-Control-Allow-Origin", [
+		"http://localhost:3000",
+		"https://sittersync.vercel.app/",
+	]);
+	res.setHeader("Access-Control-Allow-Methods", "GET");
 
 	if (!req.headers.authorization) {
 		res.status(401).json({ error: "Unauthorized" });
