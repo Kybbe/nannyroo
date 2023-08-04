@@ -1,4 +1,5 @@
 interface ScheduleEvent {
+	_id: string;
 	id: string;
 	title: string;
 	start?: string;
@@ -17,6 +18,8 @@ interface ScheduleEvent {
 	startRecur?: string;
 	endRecur?: string;
 
+	parentScheduleId?: string;
+
 	extendedProps?: {
 		notes?: string;
 		place?: string;
@@ -25,6 +28,15 @@ interface ScheduleEvent {
 }
 
 interface EventStore {
+	_id: string;
+	title: string;
+	users: {
+		ownerEmail: string;
+		sharingWith: {
+			userEmail: string;
+			permissions: "read" | "write";
+		}[];
+	};
 	events: ScheduleEvent[];
 }
 
