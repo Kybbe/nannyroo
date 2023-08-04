@@ -1,5 +1,8 @@
 import admin, { ServiceAccount } from "firebase-admin";
-import serviceAccount from "./sittersync-firebase-adminsdk-j5zgq-f40209e460.json";
+
+const serviceAccount = JSON.parse(
+	process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
+);
 
 if (admin.apps.length === 0) {
 	admin.initializeApp({

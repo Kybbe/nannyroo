@@ -1,5 +1,5 @@
-import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "@/hooks/redux/useAppSelector";
 
 export default function UseGetAllFlattenedEvents() {
 	const schedules = useAppSelector(state => state.schedule.schedules);

@@ -5,7 +5,6 @@ import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import { setActiveSchedule, setSchedules } from "@/store/slices/scheduleSlice";
 import { useAuthContext } from "@/context/AuthContext";
-import saveToDatabase from "@/helpers/frontend/saveToDb";
 import EditSchedulePopover from "./Popovers/EditSchedulePopover";
 import ScheduleSwitcher from "./ScheduleSwitcher";
 

@@ -1,10 +1,10 @@
+/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
 import { useEffect, useState } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import {
 	deleteEvent,
@@ -33,7 +33,6 @@ export default function EditEventPopover({
 	event,
 	setUndoStack,
 }: Props) {
-	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
 	const flattenedWriteableEvents = UseGetAllWriteableEvents();
 	const dispatch = useAppDispatch();
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { useAuthContext } from "@/context/AuthContext";
-import signUp, { signIn } from "@/helpers/frontend/firebase/Auth";
 import {
 	AuthError,
 	GoogleAuthProvider,
@@ -11,6 +9,8 @@ import {
 } from "firebase/auth";
 import Link from "next/link";
 import { useState } from "react";
+import signUp, { signIn } from "@/helpers/frontend/firebase/Auth";
+import { useAuthContext } from "@/context/AuthContext";
 
 const provider = new GoogleAuthProvider();
 
@@ -29,6 +29,7 @@ export default function Profile() {
 	const loginRegister = async () => {
 		if (loading) return;
 		if (!loginInfo.email || !loginInfo.password) {
+			// eslint-disable-next-line no-alert
 			alert("Please enter an email and password");
 			return;
 		}

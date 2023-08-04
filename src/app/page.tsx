@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import Router from "next/router";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function Home() {
 	const user = useAuthContext();

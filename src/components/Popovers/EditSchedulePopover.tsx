@@ -1,9 +1,7 @@
+/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "@/hooks/redux/useAppSelector";
-import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
-import { updateSchedule } from "@/store/slices/scheduleSlice";
 import * as Select from "@radix-ui/react-select";
 import {
 	CheckIcon,
@@ -12,8 +10,11 @@ import {
 	PlusIcon,
 	TrashIcon,
 } from "@radix-ui/react-icons";
-import saveToDatabase from "@/helpers/frontend/saveToDb";
 import { getAuth } from "firebase/auth";
+import { useAppSelector } from "@/hooks/redux/useAppSelector";
+import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
+import { updateSchedule } from "@/store/slices/scheduleSlice";
+import saveToDatabase from "@/helpers/frontend/saveToDb";
 import styles from "./EditEventPopover.module.scss";
 
 interface Props {

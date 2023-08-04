@@ -7,8 +7,6 @@ export default function Loader({
 	loading: boolean;
 	children: ReactNode;
 }) {
-	const asd = 1;
-
 	if (loading) {
 		return (
 			<div className="flex flex-1 justify-center items-center flex-col text-center">

@@ -1,6 +1,6 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import Schedule from "@/helpers/Mongo/Schemas/Schedule";
 import mongoConnection from "@/helpers/Mongo/mongoConnection";
-import { NextApiRequest, NextApiResponse } from "next";
 import admin from "@/helpers/backend/firebase/adminInit";
 import {
 	checkReadPermissions,

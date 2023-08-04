@@ -1,13 +1,13 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
-import { useAppSelector } from "@/hooks/redux/useAppSelector";
-import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
-import { addEvent as createStoreEvent } from "@/store/slices/scheduleSlice";
 import FullCalendar from "@fullcalendar/react";
 import { useEffect, useState } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
+import { addEvent as createStoreEvent } from "@/store/slices/scheduleSlice";
+import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
+import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
 import styles from "./CreateEventPopover.module.scss";
@@ -100,8 +100,10 @@ export default function CreateEventPopover({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open, propStart, propEnd]);
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function createRecurringEvent(event: any) {
 		if (event.daysOfWeek?.length === 0) {
+			// eslint-disable-next-line no-alert
 			alert("Please select at least one day of the week");
 			return null;
 		}
@@ -124,6 +126,7 @@ export default function CreateEventPopover({
 				place: event.extendedProps?.place,
 				completed: false,
 			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			daysOfWeek: event.daysOfWeek?.map((d: any) => d.value),
 		};
 
@@ -134,12 +137,14 @@ export default function CreateEventPopover({
 		return newEvent as ScheduleEvent;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function createNormalEvent(event: any) {
 		const startFormatted = new Date(data.start);
 		const endFormatted = new Date(data.end);
 
 		// check if start is before end
 		if (startFormatted > endFormatted) {
+			// eslint-disable-next-line no-alert
 			alert("Start date must be before end date");
 			return null;
 		}

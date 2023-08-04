@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useAuthContext } from "@/context/AuthContext";
 import Router from "next/router";
 import { getAuth, signOut } from "firebase/auth";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function LoginLogoutBtn() {
 	const user = useAuthContext();

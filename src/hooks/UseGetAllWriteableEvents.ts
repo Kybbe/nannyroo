@@ -1,5 +1,5 @@
-import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "@/context/AuthContext";
 import UseGetAllFlattenedEvents from "./UseGetAllFlattenedEvents";
 import { useAppSelector } from "./redux/useAppSelector";
 

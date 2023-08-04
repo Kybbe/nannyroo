@@ -11,21 +11,16 @@ import {
 	EventChangeArg,
 	EventClickArg,
 } from "@fullcalendar/core";
+import * as Checkbox from "@radix-ui/react-checkbox";
+import { CheckIcon } from "@radix-ui/react-icons";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
-import {
-	addEvent as addStoreEvent,
-	deleteEvent as deleteStoreEvent,
-	updateEvent as editStoreEvent,
-} from "@/store/slices/scheduleSlice";
+import { updateEvent as editStoreEvent } from "@/store/slices/scheduleSlice";
 import CreateEventPopover from "@/components/Popovers/CreateEventPopover";
 import EditEventPopover from "@/components/Popovers/EditEventPopover";
 import { formatTime } from "@/helpers/frontend/DateFormat";
-import * as Checkbox from "@radix-ui/react-checkbox";
-import { CheckIcon } from "@radix-ui/react-icons";
 import ScheduleEditor from "@/components/ScheduleEditor";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
-import { useAuthContext } from "@/context/AuthContext";
 import UseGetAllFlattenedEvents from "@/hooks/UseGetAllFlattenedEvents";
 import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 
@@ -134,18 +129,16 @@ export default function Schedule() {
 		saveToDatabase(newEvent, newEvent.parentScheduleId, "event", "PUT");
 	};
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const renderEventContent = (eventInfo: any) => {
 		const { event } = eventInfo;
 		const {
 			id,
-			groupId,
 			start,
 			end,
 			allDay,
 			title,
-			startTime,
-			endTime,
-			extendedProps: { notes, place, completed },
+			extendedProps: { completed },
 		} = event;
 		return (
 			<>

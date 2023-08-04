@@ -1,5 +1,5 @@
-import mongoConnection from "@/helpers/Mongo/mongoConnection";
 import { NextApiRequest, NextApiResponse } from "next";
+import mongoConnection from "@/helpers/Mongo/mongoConnection";
 import Schedule from "@/helpers/Mongo/Schemas/Schedule";
 import { checkWritePermissions } from "@/helpers/backend/checkPermission";
 import getAndCheckAuth from "@/helpers/backend/getAndCheckAuth";
@@ -88,7 +88,7 @@ async function createEvent(req: NextApiRequest, res: NextApiResponse) {
 	try {
 		await mongoConnection();
 
-		const { user, email } = await getAndCheckAuth(req, res);
+		await getAndCheckAuth(req, res);
 
 		const target = await Schedule.findById<EventStore>(req.query.id);
 		if (!target) {
@@ -124,7 +124,7 @@ async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
 	try {
 		await mongoConnection();
 
-		const { user, email } = await getAndCheckAuth(req, res);
+		await getAndCheckAuth(req, res);
 
 		const target = await Schedule.findById<EventStore>(req.query.id);
 		if (!target) {
@@ -166,7 +166,7 @@ async function deleteEvent(req: NextApiRequest, res: NextApiResponse) {
 	try {
 		await mongoConnection();
 
-		const { user, email } = await getAndCheckAuth(req, res);
+		await getAndCheckAuth(req, res);
 
 		const target = await Schedule.findById<EventStore>(req.query.id);
 		if (!target) {

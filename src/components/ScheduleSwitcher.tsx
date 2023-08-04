@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,6 +12,7 @@ import {
 	PlusIcon,
 	ReloadIcon,
 } from "@radix-ui/react-icons";
+import { getAuth } from "firebase/auth";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import {
@@ -18,7 +21,6 @@ import {
 	setSchedules,
 } from "@/store/slices/scheduleSlice";
 import { useAuthContext } from "@/context/AuthContext";
-import { getAuth } from "firebase/auth";
 
 interface Props {
 	value?: string;
