@@ -1,4 +1,4 @@
-import { Theme } from "next-auth";
+/* import { Theme } from "next-auth";
 import { EmailConfig } from "next-auth/providers";
 import { createTransport } from "nodemailer";
 
@@ -336,3 +336,4 @@ function html(params: { url: string; host: string; theme: Theme }) {
 function text({ url, host }: { url: string; host: string }) {
 	return `Sign in to ${host}\n${url}\n\n`;
 }
+ */

@@ -1,9 +1,9 @@
-import { NextAuthProvider } from "@/components/Layout/NextAuthProvider";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Header from "@/components/Layout/Header";
 import { ReduxStoreProvider } from "@/components/Layout/ReduxStoreProvider";
+import { AuthContextProvider } from "@/context/AuthContext";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
@@ -25,10 +25,10 @@ export default function RootLayout({
 				className={`${nunito.className} bg-neutral-50 dark:bg-neutral-950 text-primaryDark dark:text-primaryBackground min-h-screen flex flex-col`}
 			>
 				<ReduxStoreProvider>
-					<NextAuthProvider>
+					<AuthContextProvider>
 						<Header />
 						{children}
-					</NextAuthProvider>
+					</AuthContextProvider>
 				</ReduxStoreProvider>
 			</body>
 		</html>

@@ -12,7 +12,6 @@ import {
 import storage from "redux-persist/lib/storage";
 import uiSlice from "./slices/uiSlice";
 import scheduleSlice from "./slices/scheduleSlice";
-import userSlice from "./slices/userSlice";
 
 const persistConfig = {
 	key: "root",
@@ -28,7 +27,6 @@ const persistedScheduleReducer = persistReducer(
 export const store = configureStore({
 	reducer: {
 		ui: persistedUiReducer,
-		user: userSlice.reducer,
 		schedule: persistedScheduleReducer,
 	},
 	middleware: getDefaultMiddleware =>

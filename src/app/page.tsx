@@ -1,10 +1,11 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { useAuthContext } from "@/context/AuthContext";
 import Link from "next/link";
+import Router from "next/router";
 
 export default function Home() {
-	const { data: session } = useSession();
+	const user = useAuthContext();
 	return (
 		<main className="flex flex-col items-center p-2 sm:p-24">
 			<div className="flex flex-col items-center gap-4">
@@ -31,9 +32,9 @@ export default function Home() {
 			</div>
 
 			<div className="flex flex-col items-center gap-4 mt-24">
-				{session ? (
+				{user ? (
 					<h2 className="text-2xl font-bold text-center">
-						Welcome back, {session.user?.name}!
+						Welcome back, {user.displayName || user.email}!
 					</h2>
 				) : (
 					<h2 className="text-2xl font-bold text-center">
@@ -42,7 +43,7 @@ export default function Home() {
 				)}
 
 				<div className="flex flex-row items-center gap-4">
-					{session ? (
+					{user ? (
 						<Link href="/schedule" className="hover:underline">
 							Go to schedule
 						</Link>
@@ -51,10 +52,10 @@ export default function Home() {
 							type="button"
 							className="bg-primaryDark text-primaryBackground hover:bg-teal-900 transition-colors font-bold text-2xl p-4 rounded-lg"
 							onClick={() => {
-								signIn();
+								Router.push("/profile");
 							}}
 						>
-							Sign up / Sign in
+							Get started for free!
 						</button>
 					)}
 				</div>

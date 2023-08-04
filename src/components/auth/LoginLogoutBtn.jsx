@@ -1,17 +1,30 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
+import { useAuthContext } from "@/context/AuthContext";
+import Router from "next/router";
+import { getAuth, signOut } from "firebase/auth";
 
 export default function LoginLogoutBtn() {
-	const { data: session } = useSession();
-	if (session) {
+	const user = useAuthContext();
+
+	if (user) {
 		return (
 			<>
-				<Link href="/profile">Welcome {session.user.name}!</Link>
+				<Link href="/profile">Welcome {user.displayName || user.email}!</Link>
 				<button
 					type="button"
-					onClick={() => signOut()}
+					onClick={async () => {
+						console.info("Signed out");
+						const auth = getAuth();
+						const { result, error } = await signOut(auth);
+
+						if (error) {
+							console.error(error);
+							return;
+						}
+						console.info("Signed out result", result);
+					}}
 					className="hover:underline font-bold"
 				>
 					Sign out
@@ -22,7 +35,9 @@ export default function LoginLogoutBtn() {
 	return (
 		<button
 			type="button"
-			onClick={() => signIn()}
+			onClick={() => {
+				Router.push("/profile");
+			}}
 			className="hover:underline font-bold"
 		>
 			Sign in
