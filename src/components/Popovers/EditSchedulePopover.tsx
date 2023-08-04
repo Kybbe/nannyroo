@@ -90,17 +90,14 @@ export default function EditSchedulePopover({ children }: Props) {
 			users: data.users,
 		};
 
-		const response = await fetch(
-			`http://localhost:3000/api/schedule?id=${activeSchedule._id}`,
-			{
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify(newSchedule),
-			}
-		);
+		const response = await fetch(`/api/schedule?id=${activeSchedule._id}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(newSchedule),
+		});
 
 		const editedSchedule = (await response.json()) as { success: boolean };
 		if (!editedSchedule.success) {

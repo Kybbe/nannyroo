@@ -19,9 +19,7 @@ export default async function saveToDatabase(
 
 	const queryId = type === "event" ? parentScheduleId : object._id;
 
-	const link = `http://localhost:3000/api/${type}${
-		queryId ? `?id=${queryId}` : ""
-	}`;
+	const link = `/api/${type}${queryId ? `?id=${queryId}` : ""}`;
 
 	const response = await fetch(link, {
 		method: action,

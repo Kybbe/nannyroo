@@ -25,7 +25,7 @@ export default function ScheduleEditor() {
 		const token = await user?.getIdToken(true);
 
 		const response = await fetch(
-			`http://localhost:3000/api/schedule?id=${storeSelectedSchedule._id}`,
+			`/api/schedule?id=${storeSelectedSchedule._id}`,
 			{
 				method: "DELETE",
 				headers: {

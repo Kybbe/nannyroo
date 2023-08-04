@@ -47,7 +47,7 @@ export default function ScheduleEditor({
 
 		const token = await user?.getIdToken(true);
 
-		const response = await fetch("http://localhost:3000/api/schedule", {
+		const response = await fetch("/api/schedule", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function ScheduleEditor({
 			return;
 		}
 
-		const response = await fetch("http://localhost:3000/api/schedule/self", {
+		const response = await fetch("/api/schedule/self", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
