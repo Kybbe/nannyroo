@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Router from "next/router";
 import { useAuthContext } from "@/context/AuthContext";
+import { ArrowRightIcon, DividerHorizontalIcon } from "@radix-ui/react-icons";
 
 export default function Home() {
 	const user = useAuthContext();
@@ -16,7 +17,14 @@ export default function Home() {
 				</h3>
 			</div>
 
-			<div className="flex flex-col items-center gap-4 mt-24">
+			<DividerHorizontalIcon
+				style={{
+					height: "2em",
+					width: "2em",
+				}}
+			/>
+
+			<div className="flex flex-col items-center gap-4 mt-4 sm:mt-24">
 				<h2 className="text-2xl font-bold text-center">Features:</h2>
 				<ul className="flex flex-col items-center gap-4">
 					<li className="text-xl font-bold text-center">
@@ -31,7 +39,14 @@ export default function Home() {
 				</ul>
 			</div>
 
-			<div className="flex flex-col items-center gap-4 mt-24">
+			<DividerHorizontalIcon
+				style={{
+					height: "2em",
+					width: "2em",
+				}}
+			/>
+
+			<div className="flex flex-col items-center gap-4 mt-4 sm:mt-24">
 				{user ? (
 					<h2 className="text-2xl font-bold text-center">
 						Welcome back, {user.displayName || user.email}!
@@ -44,8 +59,17 @@ export default function Home() {
 
 				<div className="flex flex-row items-center gap-4">
 					{user ? (
-						<Link href="/schedule" className="hover:underline">
+						<Link
+							href="/schedule"
+							className="hover:underline text-xl flex flex-row justify-center items-center gap-2 hover:gap-4 transition-all"
+						>
 							Go to schedule
+							<ArrowRightIcon
+								style={{
+									height: "1.5em",
+									width: "1.5em",
+								}}
+							/>
 						</Link>
 					) : (
 						<button

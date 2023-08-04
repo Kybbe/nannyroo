@@ -152,7 +152,7 @@ export default function Schedule() {
 	};
 
 	const completeEvent = (id: string, completed: boolean) => {
-		const event = eventStore.events.find(e => e.id === id);
+		const event = flattenedWriteableEvents?.find(e => e.id === id);
 		if (!event) return;
 
 		const newEvent = {
