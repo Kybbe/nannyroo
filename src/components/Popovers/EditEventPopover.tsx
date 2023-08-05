@@ -215,7 +215,7 @@ export default function EditEventPopover({
 			<Popover.Anchor style={{ position: "absolute", left: x, top: y }} />
 			<Popover.Portal>
 				<Popover.Content
-					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10`}
+					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-neutral-800 shadow-md z-10`}
 					sideOffset={5}
 				>
 					<form
@@ -236,7 +236,7 @@ export default function EditEventPopover({
 								Title
 							</label>
 							<input
-								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 								id="Title"
 								placeholder="Title"
 								defaultValue={data.title}
@@ -260,7 +260,7 @@ export default function EditEventPopover({
 										Start
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="start"
 										value={startEnd.start || ""}
 										onChange={e => {
@@ -274,7 +274,7 @@ export default function EditEventPopover({
 										End
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="end"
 										value={startEnd.end || ""}
 										onChange={e => {
@@ -290,7 +290,7 @@ export default function EditEventPopover({
 								All day
 							</label>
 							<Checkbox.Root
-								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 w-6"
+								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 dark:text-teal-800 w-6"
 								checked={data.allDay}
 								defaultChecked={data.allDay}
 								onCheckedChange={(e: boolean) => {
@@ -309,7 +309,7 @@ export default function EditEventPopover({
 							</label>
 
 							<Checkbox.Root
-								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 w-6"
+								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 dark:text-teal-800 w-6"
 								checked={data.recurring}
 								defaultChecked={data.recurring}
 								onCheckedChange={(e: boolean) => {
@@ -376,7 +376,7 @@ export default function EditEventPopover({
 									</label>
 									<input
 										type="date"
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="startRecur"
 										value={data.startRecur}
 										onChange={e => {
@@ -390,7 +390,7 @@ export default function EditEventPopover({
 									</label>
 									<input
 										type="date"
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="endRecur"
 										value={data.endRecur}
 										onChange={e => {
@@ -426,7 +426,7 @@ export default function EditEventPopover({
 										Notes
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="notes"
 										defaultValue={data.notes}
 										onChange={e => {
@@ -439,7 +439,7 @@ export default function EditEventPopover({
 										Place
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="place"
 										defaultValue={data.place}
 										onChange={e => {
@@ -463,7 +463,7 @@ export default function EditEventPopover({
 										);
 										onOpenChange(false);
 									}}
-									className="border-red-700 border-2 border-solid text-red-700 hover:border-red-950 hover:text-red-950 transition-colors rounded-md px-4 py-2 text-sm font-bold"
+									className="border-red-700 border-2 border-solid text-red-700 hover:border-red-600 hover:text-red-600 transition-colors rounded-md px-4 py-2 text-sm font-bold"
 								>
 									Delete
 								</button>
@@ -473,7 +473,7 @@ export default function EditEventPopover({
 								<div className="flex flex-row justify-end gap-2">
 									<button
 										type="button"
-										className="border-teal-700 border-2 border-solid text-teal-700 hover:border-teal-950 hover:text-teal-950 transition-colors rounded-md px-4 py-2 text-sm font-bold"
+										className="border-teal-700 border-2 border-solid text-teal-700 hover:border-teal-950 hover:text-teal-950 dark:hover:border-teal-500 dark:hover:text-teal-500 transition-colors rounded-md px-4 py-2 text-sm font-bold"
 										onClick={() => {
 											onOpenChange(false);
 										}}
@@ -491,7 +491,7 @@ export default function EditEventPopover({
 						</div>
 					</form>
 					<Popover.Close
-						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
+						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center"
 						aria-label="Close"
 					>
 						X

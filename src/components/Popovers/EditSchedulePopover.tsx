@@ -127,7 +127,7 @@ export default function EditSchedulePopover({ children }: Props) {
 			<Popover.Trigger asChild>{children}</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content
-					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10`}
+					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-neutral-800 shadow-md z-10`}
 					sideOffset={5}
 				>
 					<form
@@ -148,7 +148,7 @@ export default function EditSchedulePopover({ children }: Props) {
 								Id
 							</label>
 							<input
-								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 								id="Id"
 								disabled
 								defaultValue={data.id}
@@ -159,7 +159,7 @@ export default function EditSchedulePopover({ children }: Props) {
 								Title
 							</label>
 							<input
-								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 								id="Title"
 								placeholder="Title"
 								defaultValue={data.title}
@@ -181,7 +181,7 @@ export default function EditSchedulePopover({ children }: Props) {
 								Owner
 							</label>
 							<input
-								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 								id="Owner"
 								placeholder="Owner"
 								defaultValue={data.users.ownerEmail}
@@ -413,7 +413,7 @@ export default function EditSchedulePopover({ children }: Props) {
 						</fieldset>
 					</form>
 					<Popover.Close
-						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
+						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center"
 						aria-label="Close"
 					>
 						X

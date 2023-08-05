@@ -77,7 +77,7 @@ export default function Profile() {
 						onChange={e => {
 							setLoginInfo({ ...loginInfo, email: e.target.value });
 						}}
-						className="w-full p-1 border-solid border-b border-primaryDark focus:border-primaryDark"
+						className="w-full p-1 border-solid border-b border-primaryDark focus:border-primaryDark dark:text-teal-800"
 					/>
 					<input
 						type="password"
@@ -86,7 +86,7 @@ export default function Profile() {
 						onChange={e => {
 							setLoginInfo({ ...loginInfo, password: e.target.value });
 						}}
-						className="w-full p-1 border-solid border-b border-primaryDark focus:border-primaryDark"
+						className="w-full p-1 border-solid border-b border-primaryDark focus:border-primaryDark dark:text-teal-800"
 					/>
 					<button
 						className={`bg-primaryDark text-primaryBackground rounded-lg px-4 py-2 w-full ${
@@ -104,7 +104,9 @@ export default function Profile() {
 						<p className="text-red-500">{`${error.code}, ${error.message}`}</p>
 					)}
 
-					<h2 className="text-xl font-bold text-center">OR</h2>
+					<h2 className="text-xl font-bold text-center dark:text-teal-800">
+						OR
+					</h2>
 
 					<button
 						className="bg-primaryDark text-primaryBackground rounded-lg px-4 py-2 w-full hover:bg-teal-800 hover:text-neutral-100 transition-colors"
@@ -164,7 +166,7 @@ export default function Profile() {
 					id="notis"
 					name="notis"
 					type="checkbox"
-					className="cursor-pointer h-4 w-4"
+					className="cursor-pointer h-4 w-4 dark:text-teal-800"
 				/>
 			</label>
 
