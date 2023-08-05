@@ -110,7 +110,7 @@ export default function CreateEventPopover({
 
 		const newEvent = {
 			id: createEventId(),
-			title: event.title,
+			title: event.title.slice(0, 25),
 			parentScheduleId: event.parentScheduleId,
 			startTime: formatTime(event.start),
 			endTime: formatTime(event.end),
@@ -154,7 +154,7 @@ export default function CreateEventPopover({
 
 		const newEvent = {
 			id: createEventId(),
-			title: event.title,
+			title: event.title.slice(0, 25),
 			parentScheduleId: event.parentScheduleId,
 			start: ISOStart,
 			end: ISOEnd,
@@ -178,7 +178,14 @@ export default function CreateEventPopover({
 			console.error("calendarRef is null");
 			return;
 		}
-		if (!title) return;
+		if (!title) {
+			alert("Please enter a title");
+			return;
+		}
+		if (title.length > 25) {
+			alert("Title must be less than 25 characters");
+			return;
+		}
 
 		const calendarApi = calendarRef.current.getApi();
 		calendarApi.unselect(); // clear date selection

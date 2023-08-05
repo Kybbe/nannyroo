@@ -7,6 +7,11 @@ body {
   --fc-event-bg-color: #387879;
 }
 
+html.dark body {
+  --fc-border-color: #4A5568;
+  --fc-today-bg-color: #072c2d !important;
+}
+
 .fc.fc-media-screen.fc-direction-ltr.fc-theme-standard {
   flex: 1;
 }

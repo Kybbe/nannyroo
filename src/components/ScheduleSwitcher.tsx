@@ -197,7 +197,7 @@ export default function ScheduleEditor({
 										key={sch._id}
 										className="text-[13px] leading-none text-teal-900 rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative select-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:outline-none data-[highlighted]:bg-teal-100 data-[highlighted]:text-teal-800"
 									>
-										<Select.ItemText>{sch.title}</Select.ItemText>
+										<Select.ItemText>{sch.title.slice(0, 25)}</Select.ItemText>
 										<Select.ItemIndicator className="absolute left-0 w-[25px] inline-flex items-center justify-center">
 											<CheckIcon />
 										</Select.ItemIndicator>
@@ -221,7 +221,7 @@ export default function ScheduleEditor({
 										key={sch._id}
 										className="text-[13px] leading-none text-teal-900 rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative select-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:outline-none data-[highlighted]:bg-teal-100 data-[highlighted]:text-teal-800"
 									>
-										<Select.ItemText>{sch.title}</Select.ItemText>
+										<Select.ItemText>{sch.title.slice(0, 25)}</Select.ItemText>
 										<Select.ItemIndicator className="absolute left-0 w-[25px] inline-flex items-center justify-center">
 											<CheckIcon />
 										</Select.ItemIndicator>
@@ -260,7 +260,7 @@ export default function ScheduleEditor({
 						>
 							X
 						</Popover.Close>
-						<Popover.Arrow className="shadow-md" />
+						<Popover.Arrow className="shadow-md fill-neutral-100 dark:fill-gray-800" />
 
 						<h3>Title of new schedule:</h3>
 						<input

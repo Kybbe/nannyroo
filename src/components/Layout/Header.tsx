@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LoginLogoutBtn from "../auth/LoginLogoutBtn";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 export default function Header() {
 	return (
@@ -11,6 +12,7 @@ export default function Header() {
 
 			<div className="flex items-center gap-2">
 				<LoginLogoutBtn />
+				<ThemeSwitcher />
 			</div>
 		</nav>
 	);

@@ -241,6 +241,14 @@ export default function EditEventPopover({
 								placeholder="Title"
 								defaultValue={data.title}
 								onChange={e => {
+									if (!e.target.value) {
+										alert("Title cannot be empty");
+										return;
+									}
+									if (e.target.value.length > 25) {
+										alert("Title must be less than 25 characters");
+										return;
+									}
 									setData({ ...data, title: e.target.value });
 								}}
 							/>
