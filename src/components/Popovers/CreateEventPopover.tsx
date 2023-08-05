@@ -10,6 +10,7 @@ import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
+import { useAuthContext } from "@/context/AuthContext";
 import styles from "./CreateEventPopover.module.scss";
 import ColorPicker from "../ColorPicker";
 import ScheduleSwitcher from "../ScheduleSwitcher";
@@ -41,11 +42,24 @@ export default function CreateEventPopover({
 	const activeSchedule = useAppSelector(state => state.schedule.activeSchedule);
 	const allSchedules = useAppSelector(state => state.schedule.schedules);
 	const dispatch = useAppDispatch();
+	const user = useAuthContext();
 
 	const flattenedSchedules = [
 		...allSchedules.ownerSchedules,
 		...allSchedules.sharedSchedules,
 	];
+
+	const checkIfScheduleEditable = (scheduleId: string) => {
+		const selectedScedule = flattenedSchedules.find(s => s._id === scheduleId);
+
+		const selectedScheduleisEditable =
+			selectedScedule?.users.ownerEmail === user?.email ||
+			selectedScedule?.users.sharingWith?.find(
+				u => u.userEmail === user?.email && u.permissions === "write"
+			) !== undefined;
+
+		return selectedScheduleisEditable;
+	};
 
 	const createEventId = () =>
 		String(Math.round(Math.random() * 10000000000000));
@@ -253,7 +267,7 @@ export default function CreateEventPopover({
 			<Popover.Anchor style={{ position: "absolute", left: x, top: y }} />
 			<Popover.Portal>
 				<Popover.Content
-					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10`}
+					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-neutral-800 shadow-md z-10`}
 					sideOffset={5}
 				>
 					<form
@@ -278,7 +292,8 @@ export default function CreateEventPopover({
 								onValueChange={(v: string) => {
 									setData({ ...data, parentScheduleId: v });
 								}}
-								showAll={false}
+								showAllAsOption={false}
+								onlyWriteable
 							/>
 						</fieldset>
 						<fieldset className="Fieldset flex gap-5 items-center">
@@ -286,7 +301,7 @@ export default function CreateEventPopover({
 								Title
 							</label>
 							<input
-								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+								className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 								id="Title"
 								placeholder="Title"
 								onChange={e => {
@@ -301,7 +316,7 @@ export default function CreateEventPopover({
 										Start
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="start"
 										value={
 											data.start
@@ -320,7 +335,7 @@ export default function CreateEventPopover({
 										End
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="end"
 										value={
 											data.end
@@ -341,7 +356,7 @@ export default function CreateEventPopover({
 								All day
 							</label>
 							<Checkbox.Root
-								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 w-6"
+								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 dark:text-teal-800 w-6"
 								checked={data.allDay}
 								onCheckedChange={(e: boolean) => {
 									setData({ ...data, allDay: e });
@@ -359,7 +374,7 @@ export default function CreateEventPopover({
 							</label>
 
 							<Checkbox.Root
-								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 w-6"
+								className="bg-white inline-flex items-center justify-center rounded-sm px-2 h-6 dark:text-teal-800 w-6"
 								checked={data.recurring}
 								onCheckedChange={(e: boolean) => {
 									setData({ ...data, recurring: e });
@@ -405,7 +420,7 @@ export default function CreateEventPopover({
 									</label>
 									<input
 										type="date"
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="startRecur"
 										value={data.startRecur}
 										onChange={e => {
@@ -419,7 +434,7 @@ export default function CreateEventPopover({
 									</label>
 									<input
 										type="date"
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="endRecur"
 										value={data.endRecur}
 										onChange={e => {
@@ -455,7 +470,7 @@ export default function CreateEventPopover({
 										Notes
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="notes"
 										defaultValue=""
 										onChange={e => {
@@ -468,7 +483,7 @@ export default function CreateEventPopover({
 										Place
 									</label>
 									<input
-										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6"
+										className="Input w-full inline-flex items-center justify-center flex-1 rounded-sm px-2 h-6 dark:text-teal-800"
 										id="place"
 										defaultValue=""
 										onChange={e => {
@@ -497,7 +512,7 @@ export default function CreateEventPopover({
 						</div>
 					</form>
 					<Popover.Close
-						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
+						className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center"
 						aria-label="Close"
 					>
 						X
