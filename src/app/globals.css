@@ -5,11 +5,16 @@
 body {
   --fc-today-bg-color: #E5FFFC !important;
   --fc-event-bg-color: #387879;
+  --fc-event-border-color: #224849;
 }
 
 html.dark body {
   --fc-border-color: #4A5568;
   --fc-today-bg-color: #072c2d !important;
+}
+
+.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+  box-shadow: none !important;
 }
 
 .fc.fc-media-screen.fc-direction-ltr.fc-theme-standard {
