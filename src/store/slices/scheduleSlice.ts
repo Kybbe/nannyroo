@@ -73,6 +73,9 @@ const scheduleSlice = createSlice({
 			if (!parentSchedule) return;
 
 			parentSchedule.events.push(action.payload);
+
+			if (state.activeSchedule._id === parentSchedule._id)
+				state.activeSchedule.events.push(action.payload);
 		},
 		updateEvent: (state, action) => {
 			const flattenedSchedules = [
@@ -90,6 +93,13 @@ const scheduleSlice = createSlice({
 				event => event.id === action.payload.id
 			);
 			parentSchedule.events[eventIndex] = action.payload;
+
+			if (state.activeSchedule._id === parentSchedule._id) {
+				const activeEventIndex = state.activeSchedule.events.findIndex(
+					event => event.id === action.payload.id
+				);
+				state.activeSchedule.events[activeEventIndex] = action.payload;
+			}
 		},
 		deleteEvent: (state, action) => {
 			const flattenedSchedules = [
@@ -106,6 +116,28 @@ const scheduleSlice = createSlice({
 			parentSchedule.events = parentSchedule.events.filter(
 				event => event.id !== action.payload.id
 			);
+
+			if (state.activeSchedule._id === parentSchedule._id)
+				state.activeSchedule.events = state.activeSchedule.events.filter(
+					event => event.id !== action.payload.id
+				);
+
+			if (parentSchedule.events.length === 0) {
+				if (state.activeSchedule._id === parentSchedule._id) {
+					state.activeSchedule = {
+						_id: "all",
+						title: "All schedules combined",
+						users: {
+							ownerEmail: "",
+							sharingWith: [],
+						},
+						events: state.schedules.ownerSchedules
+							.concat(state.schedules.sharedSchedules)
+							.flatMap(schedule => schedule.events),
+					};
+					state.activeScheduleType = "all";
+				}
+			}
 		},
 
 		setSchedules: (state, action) => {

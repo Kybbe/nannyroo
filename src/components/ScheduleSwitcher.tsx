@@ -36,6 +36,9 @@ export default function ScheduleEditor({
 	onlyWriteable,
 }: Props) {
 	const schedules = useAppSelector(state => state.schedule.schedules);
+	const storeActiveSchedule = useAppSelector(
+		state => state.schedule.activeSchedule
+	);
 
 	const [title, setTitle] = useState("");
 	const [createPopoverOpen, setCreatePopoverOpen] = useState(false);
@@ -117,7 +120,7 @@ export default function ScheduleEditor({
 		// if result contains a schedule with the same id as the current active schedule, set the active schedule to that
 		const schedulesFlat = [...result.ownerSchedules, ...result.sharedSchedules];
 		const storeSchedule = schedulesFlat.find(
-			s => s._id === value
+			s => s._id === storeActiveSchedule._id
 		) as EventStore;
 
 		if (storeSchedule) {
