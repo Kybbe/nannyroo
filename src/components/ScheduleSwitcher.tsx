@@ -25,13 +25,15 @@ import { useAuthContext } from "@/context/AuthContext";
 interface Props {
 	value?: string;
 	onValueChange: (value: string) => void;
-	showAll?: boolean;
+	showAllAsOption?: boolean;
+	onlyWriteable?: boolean;
 }
 
 export default function ScheduleEditor({
 	value,
 	onValueChange,
-	showAll,
+	showAllAsOption,
+	onlyWriteable,
 }: Props) {
 	const schedules = useAppSelector(state => state.schedule.schedules);
 
@@ -39,6 +41,16 @@ export default function ScheduleEditor({
 	const [createPopoverOpen, setCreatePopoverOpen] = useState(false);
 
 	const user = useAuthContext();
+
+	const writeableSchedules = {
+		ownerSchedules: schedules.ownerSchedules,
+		sharedSchedules: schedules.sharedSchedules.filter(
+			s =>
+				s.users.sharingWith.map(
+					u => u.userEmail === user?.email && u.permissions === "write"
+				) === undefined
+		),
+	};
 
 	const dispatch = useAppDispatch();
 
@@ -133,6 +145,16 @@ export default function ScheduleEditor({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	let showingOwnerSchedules = schedules.ownerSchedules;
+	if (onlyWriteable) {
+		showingOwnerSchedules = writeableSchedules.ownerSchedules;
+	}
+
+	let showingSharedSchedules = schedules.sharedSchedules;
+	if (onlyWriteable) {
+		showingSharedSchedules = writeableSchedules.sharedSchedules;
+	}
+
 	return (
 		<div className="flex flex-row items-center gap-2">
 			<Select.Root
@@ -141,7 +163,7 @@ export default function ScheduleEditor({
 				disabled={schedules.ownerSchedules.length === 0}
 			>
 				<Select.Trigger
-					className={`inline-flex items-center justify-center rounded px-[15px] text-[13px] leading-none h-[35px] gap-[5px] bg-white dark:bg-neutral-800 text-teal-900 dark:text-teal-100 shadow-[0_2px_10px] shadow-black/10 hover:bg-mauve3 focus:shadow-[0_0_0_2px] focus:shadow-black data-[placeholder]:text-teal-800 outline-none ${
+					className={`inline-flex items-center justify-center rounded px-[15px] text-[13px] leading-none h-[35px] gap-[5px] bg-white dark:bg-neutral-700 text-teal-900 dark:text-teal-100 shadow-[0_2px_10px] shadow-black/10 hover:bg-mauve3 focus:shadow-[0_0_0_2px] focus:shadow-black data-[placeholder]:text-teal-800 outline-none ${
 						schedules.ownerSchedules.length === 0 && "opacity-50"
 					}`}
 					aria-label="Schedule switcher"
@@ -155,12 +177,12 @@ export default function ScheduleEditor({
 					</Select.Icon>
 				</Select.Trigger>
 				<Select.Portal>
-					<Select.Content className="overflow-hidden z-10 bg-white dark:bg-neutral-800 rounded-md shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]">
-						<Select.ScrollUpButton className="flex items-center justify-center h-[25px] bg-white dark:bg-neutral-800 text-teal-900 dark:text-teal-100 cursor-default">
+					<Select.Content className="overflow-hidden z-10 bg-white dark:bg-neutral-700 rounded-md shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]">
+						<Select.ScrollUpButton className="flex items-center justify-center h-[25px] bg-white dark:bg-neutral-700 text-teal-900 dark:text-teal-100 cursor-default">
 							<ChevronUpIcon />
 						</Select.ScrollUpButton>
 						<Select.Viewport className="p-[5px]">
-							{showAll !== false && (
+							{showAllAsOption !== false && (
 								<>
 									<Select.Group>
 										<Select.Item
@@ -169,8 +191,8 @@ export default function ScheduleEditor({
 										>
 											<Select.ItemText>
 												All schedules combined (
-												{schedules.ownerSchedules.length +
-													schedules.sharedSchedules.length}
+												{showingOwnerSchedules.length +
+													showingSharedSchedules.length}
 												)
 											</Select.ItemText>
 											<Select.ItemIndicator className="absolute left-0 w-[25px] inline-flex items-center justify-center">
@@ -186,13 +208,13 @@ export default function ScheduleEditor({
 							<Select.Group>
 								<Select.Label
 									className={`text-xs leading-[25px] text-neutral-500 ${
-										schedules.ownerSchedules.length === 0 &&
+										showingOwnerSchedules.length === 0 &&
 										"text-neutral-200 dark:text-neutral-700"
 									}`}
 								>
 									Created by you
 								</Select.Label>
-								{schedules.ownerSchedules.map(sch => (
+								{showingOwnerSchedules.map(sch => (
 									<Select.Item
 										value={sch._id}
 										key={sch._id}
@@ -211,12 +233,12 @@ export default function ScheduleEditor({
 							<Select.Group>
 								<Select.Label
 									className={`text-xs leading-[25px] text-neutral-500 ${
-										schedules.sharedSchedules.length === 0 && "text-neutral-200"
+										showingSharedSchedules.length === 0 && "text-neutral-200"
 									}`}
 								>
 									Shared with you
 								</Select.Label>
-								{schedules.sharedSchedules.map(sch => (
+								{showingSharedSchedules.map(sch => (
 									<Select.Item
 										value={sch._id}
 										key={sch._id}
@@ -252,11 +274,11 @@ export default function ScheduleEditor({
 				</Popover.Trigger>
 				<Popover.Portal>
 					<Popover.Content
-						className="rounded p-4 bg-neutral-100 dark:bg-gray-800 shadow-md z-10 flex gap-1 flex-col"
+						className="rounded p-4 bg-neutral-100 dark:bg-neutral-700 shadow-md z-10 flex gap-1 flex-col"
 						sideOffset={5}
 					>
 						<Popover.Close
-							className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-sm bg-neutral-100 dark:bg-gray-800 flex items-center justify-center"
+							className="PopoverClose absolute top-2 right-2 h-6 w-6 rounded-sm bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center"
 							aria-label="Close"
 						>
 							X
