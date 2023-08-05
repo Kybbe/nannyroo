@@ -39,7 +39,13 @@ export default function CreateEventPopover({
 }: Props) {
 	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
 	const activeSchedule = useAppSelector(state => state.schedule.activeSchedule);
+	const allSchedules = useAppSelector(state => state.schedule.schedules);
 	const dispatch = useAppDispatch();
+
+	const flattenedSchedules = [
+		...allSchedules.ownerSchedules,
+		...allSchedules.sharedSchedules,
+	];
 
 	const createEventId = () =>
 		String(Math.round(Math.random() * 10000000000000));
@@ -50,7 +56,12 @@ export default function CreateEventPopover({
 
 	const [data, setData] = useState({
 		title: "",
-		parentScheduleId: eventStore._id === "all" ? undefined : eventStore._id,
+		parentScheduleId:
+			eventStore._id === "all"
+				? flattenedSchedules.length === 1
+					? flattenedSchedules[0]._id
+					: undefined
+				: eventStore._id,
 		start: propStart || "",
 		end: propEnd || "",
 		startRecur: "",
@@ -83,7 +94,12 @@ export default function CreateEventPopover({
 	useEffect(() => {
 		setData({
 			title: "",
-			parentScheduleId: eventStore._id === "all" ? undefined : eventStore._id,
+			parentScheduleId:
+				eventStore._id === "all"
+					? flattenedSchedules.length === 1
+						? flattenedSchedules[0]._id
+						: undefined
+					: eventStore._id,
 			start: propStart || "",
 			end: propEnd || "",
 			startRecur: "",
@@ -465,7 +481,7 @@ export default function CreateEventPopover({
 						<div className="flex flex-row justify-end gap-2">
 							<button
 								type="button"
-								className="border-teal-700 border-2 border-solid text-teal-700 hover:border-teal-950 hover:text-teal-950 transition-colors rounded-md px-4 py-2 text-sm font-bold"
+								className="border-teal-700 border-2 border-solid text-teal-700 hover:border-teal-950 hover:text-teal-950 dark:hover:border-teal-500 dark:hover:text-teal-500 transition-colors rounded-md px-4 py-2 text-sm font-bold"
 								onClick={() => {
 									onOpenChange(false);
 								}}
@@ -486,7 +502,9 @@ export default function CreateEventPopover({
 					>
 						X
 					</Popover.Close>
-					<Popover.Arrow className={`${styles.PopoverArrow} shadow-md`} />
+					<Popover.Arrow
+						className={`${styles.PopoverArrow} shadow-md fill-neutral-100 dark:fill-gray-800`}
+					/>
 				</Popover.Content>
 			</Popover.Portal>
 		</Popover.Root>

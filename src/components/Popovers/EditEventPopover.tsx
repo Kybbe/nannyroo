@@ -496,7 +496,9 @@ export default function EditEventPopover({
 					>
 						X
 					</Popover.Close>
-					<Popover.Arrow className={`${styles.PopoverArrow} shadow-md`} />
+					<Popover.Arrow
+						className={`${styles.PopoverArrow} shadow-md fill-neutral-100 dark:fill-gray-800`}
+					/>
 				</Popover.Content>
 			</Popover.Portal>
 		</Popover.Root>

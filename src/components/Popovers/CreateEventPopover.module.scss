@@ -17,7 +17,7 @@
   transform: scale(3);
   fill: #F5F5F5;
 
-  body.dark & {
+  html.dark & {
     fill: #1E293B;
   }
 }
