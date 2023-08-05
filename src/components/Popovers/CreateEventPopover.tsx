@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
 import FullCalendar from "@fullcalendar/react";
@@ -203,7 +204,7 @@ export default function CreateEventPopover({
 	}
 
 	function createEvent() {
-		const { title, recurring } = data;
+		const { title, parentScheduleId, recurring } = data;
 		if (!calendarRef || !calendarRef.current) {
 			console.error("calendarRef is null");
 			return;
@@ -214,6 +215,15 @@ export default function CreateEventPopover({
 		}
 		if (title.length > 25) {
 			alert("Title must be less than 25 characters");
+			return;
+		}
+
+		if (!parentScheduleId) {
+			alert("Please select a schedule");
+			return;
+		}
+		if (!checkIfScheduleEditable(parentScheduleId)) {
+			alert("You do not have permission to edit this schedule");
 			return;
 		}
 
