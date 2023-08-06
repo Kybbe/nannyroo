@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-
 "use client";
 
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -14,6 +12,7 @@ import {
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
+import { getAuth } from "firebase/auth";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import { updateEvent as editStoreEvent } from "@/store/slices/scheduleSlice";
@@ -25,6 +24,8 @@ import saveToDatabase from "@/helpers/frontend/saveToDb";
 import UseGetAllFlattenedEvents from "@/hooks/UseGetAllFlattenedEvents";
 import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 import { useAuthContext } from "@/context/AuthContext";
+import ReadEventPopover from "@/components/Popovers/ReadEventPopover";
+import { openAlert } from "@/store/slices/alertSlice";
 
 export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
@@ -46,6 +47,10 @@ export default function Schedule() {
 	>(false);
 
 	const [editModalOpen, setEditModalOpen] = useState<
+		false | { x: number; y: number; event: ScheduleEvent }
+	>(false);
+
+	const [openReadModal, setOpenReadModal] = useState<
 		false | { x: number; y: number; event: ScheduleEvent }
 	>(false);
 
@@ -106,7 +111,16 @@ export default function Schedule() {
 		const storeEvent = flattenedWriteableEvents?.find(
 			e => e.id === clickInfo.event.id
 		);
-		if (!storeEvent) return;
+		if (!storeEvent) {
+			const ev = flattenedEvents?.find(e => e.id === clickInfo.event.id);
+
+			setOpenReadModal({
+				x: clickInfo.jsEvent.clientX,
+				y: clickInfo.jsEvent.clientY,
+				event: ev as ScheduleEvent,
+			});
+			return;
+		}
 
 		setEditModalOpen({
 			x: clickInfo.jsEvent.clientX,
@@ -126,7 +140,13 @@ export default function Schedule() {
 		);
 		if (!event) {
 			changeInfo.revert();
-			alert("Cannot edit events in schedules without editing permissions");
+			dispatch(
+				openAlert({
+					title: "Cannot edit events in schedules without editing permissions",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 
@@ -162,8 +182,8 @@ export default function Schedule() {
 		]);
 	};
 
-	const completeEvent = (id: string, completed: boolean) => {
-		const event = flattenedWriteableEvents?.find(e => e.id === id);
+	const completeEvent = async (id: string, completed: boolean) => {
+		const event = flattenedEvents?.find(e => e.id === id);
 		if (!event) return;
 
 		const newEvent = {
@@ -175,7 +195,34 @@ export default function Schedule() {
 		};
 
 		dispatch(editStoreEvent(newEvent));
-		saveToDatabase(newEvent, newEvent.parentScheduleId, "event", "PUT");
+
+		const auth = getAuth();
+		const token = await auth.currentUser?.getIdToken(true);
+		if (!token) {
+			console.error("Failed to get token");
+			return;
+		}
+
+		const res = await fetch(
+			`/api/event/complete?id=${event.parentScheduleId}`,
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(newEvent),
+			}
+		);
+
+		const result = await res.json();
+
+		if (!result.success) {
+			console.error(result.error);
+			return;
+		}
+
+		console.info("Successfully completed event");
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -311,6 +358,16 @@ export default function Schedule() {
 				y={editModalOpen === false ? 0 : editModalOpen.y}
 				event={editModalOpen === false ? undefined : editModalOpen.event}
 				setUndoStack={setUndoStack}
+			/>
+
+			<ReadEventPopover
+				open={openReadModal !== false}
+				onOpenChange={() => {
+					setOpenReadModal(false);
+				}}
+				x={openReadModal === false ? 0 : openReadModal.x}
+				y={openReadModal === false ? 0 : openReadModal.y}
+				event={openReadModal === false ? undefined : openReadModal.event}
 			/>
 
 			<div className="relative min-w-full flex flex-1">
