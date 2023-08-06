@@ -20,7 +20,7 @@ interface ScheduleEvent {
 
 	parentScheduleId?: string;
 
-	extendedProps?: {
+	extendedProps: {
 		notes?: string;
 		place?: string;
 		completed?: boolean;
