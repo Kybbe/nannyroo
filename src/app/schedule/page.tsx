@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+
 "use client";
 
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -28,6 +30,10 @@ export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
 	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
 	const allSchedules = useAppSelector(state => state.schedule.schedules);
+	const flattenedSchedules = [
+		...allSchedules.ownerSchedules,
+		...allSchedules.sharedSchedules,
+	];
 	const flattenedEvents = UseGetAllFlattenedEvents();
 	const flattenedWriteableEvents = UseGetAllWriteableEvents();
 	const router = useRouter();
@@ -112,12 +118,17 @@ export default function Schedule() {
 	const editEvent = (changeInfo: EventChangeArg) => {
 		if (!calendarRef.current) {
 			console.error("calendarRef is null");
+			changeInfo.revert();
 			return;
 		}
 		const event = flattenedWriteableEvents?.find(
 			e => e.id === changeInfo.event.id
 		);
-		if (!event) return;
+		if (!event) {
+			changeInfo.revert();
+			alert("Cannot edit events in schedules without editing permissions");
+			return;
+		}
 
 		let newEvent: ScheduleEvent;
 
@@ -176,6 +187,7 @@ export default function Schedule() {
 			end,
 			allDay,
 			title,
+			parentScheduleId,
 			extendedProps: { completed },
 		} = event;
 		return (
@@ -196,6 +208,9 @@ export default function Schedule() {
 						<CheckIcon />
 					</Checkbox.Indicator>
 				</Checkbox.Root>
+
+				<p>{flattenedSchedules.find(s => s._id === parentScheduleId)?.title}</p>
+
 				{allDay ? (
 					<p className="text-xs" style={completed ? { opacity: 0.5 } : {}}>
 						All day
