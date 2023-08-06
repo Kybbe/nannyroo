@@ -1,12 +1,14 @@
 "use client";
 
-import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
+import { Pencil1Icon, PersonIcon, TrashIcon } from "@radix-ui/react-icons";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
 import { setActiveSchedule, setSchedules } from "@/store/slices/scheduleSlice";
 import { useAuthContext } from "@/context/AuthContext";
 import EditSchedulePopover from "./Popovers/EditSchedulePopover";
 import ScheduleSwitcher from "./ScheduleSwitcher";
+import ShareePopover from "./Popovers/ShareePopover";
 
 export default function ScheduleEditor() {
 	const storeSelectedSchedule = useAppSelector(
@@ -107,24 +109,78 @@ export default function ScheduleEditor() {
 						u => u.userEmail === user?.email
 					)?.permissions === "write") && (
 					<>
-						<EditSchedulePopover>
-							<button
-								type="button"
-								className="bg-orange-500 text-white rounded-lg p-2 ml-2"
-							>
-								<Pencil1Icon />
-							</button>
-						</EditSchedulePopover>
+						<Tooltip.Provider delayDuration={400}>
+							<Tooltip.Root>
+								<ShareePopover>
+									<Tooltip.Trigger asChild>
+										<button
+											type="button"
+											className="bg-purple-500 text-white rounded-lg p-2 ml-2"
+										>
+											<PersonIcon />
+										</button>
+									</Tooltip.Trigger>
+								</ShareePopover>
+								<Tooltip.Portal>
+									<Tooltip.Content
+										className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white dark:bg-neutral-800 px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+										sideOffset={5}
+									>
+										Share schedule with others
+										<Tooltip.Arrow className="fill-white dark:fill-neutral-800" />
+									</Tooltip.Content>
+								</Tooltip.Portal>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 
-						<button
-							type="button"
-							className="bg-red-500 text-white rounded-lg p-2"
-							onClick={() => {
-								deleteSchedule();
-							}}
-						>
-							<TrashIcon />
-						</button>
+						<Tooltip.Provider delayDuration={400}>
+							<Tooltip.Root>
+								<EditSchedulePopover>
+									<Tooltip.Trigger asChild>
+										<button
+											type="button"
+											className="bg-orange-500 text-white rounded-lg p-2"
+										>
+											<Pencil1Icon />
+										</button>
+									</Tooltip.Trigger>
+								</EditSchedulePopover>
+								<Tooltip.Portal>
+									<Tooltip.Content
+										className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white dark:bg-neutral-800 px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+										sideOffset={5}
+									>
+										Edit schedule
+										<Tooltip.Arrow className="fill-white dark:fill-neutral-800" />
+									</Tooltip.Content>
+								</Tooltip.Portal>
+							</Tooltip.Root>
+						</Tooltip.Provider>
+
+						<Tooltip.Provider delayDuration={400}>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										className="bg-red-500 text-white rounded-lg p-2"
+										onClick={() => {
+											deleteSchedule();
+										}}
+									>
+										<TrashIcon />
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Portal>
+									<Tooltip.Content
+										className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white dark:bg-neutral-800 px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+										sideOffset={5}
+									>
+										Delete
+										<Tooltip.Arrow className="fill-white dark:fill-neutral-800" />
+									</Tooltip.Content>
+								</Tooltip.Portal>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 					</>
 				)}
 		</div>

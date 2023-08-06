@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,6 +10,7 @@ import {
 	PlusIcon,
 	ReloadIcon,
 } from "@radix-ui/react-icons";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { getAuth } from "firebase/auth";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
@@ -21,6 +20,7 @@ import {
 	setSchedules,
 } from "@/store/slices/scheduleSlice";
 import { useAuthContext } from "@/context/AuthContext";
+import { openAlert } from "@/store/slices/alertSlice";
 
 interface Props {
 	value?: string;
@@ -47,18 +47,24 @@ export default function ScheduleEditor({
 
 	const writeableSchedules = {
 		ownerSchedules: schedules.ownerSchedules,
-		sharedSchedules: schedules.sharedSchedules.filter(
-			s =>
-				s.users.sharingWith.map(
-					u => u.userEmail === user?.email && u.permissions === "write"
-				) === undefined
+		sharedSchedules: schedules.sharedSchedules.filter(sch =>
+			sch.users.sharingWith.some(
+				u => u.userEmail === user?.email && u.permissions === "write"
+			)
 		),
 	};
 
 	const dispatch = useAppDispatch();
 
 	const createSchedule = async () => {
-		if (!title) alert("Please enter a title for the schedule");
+		if (!title)
+			dispatch(
+				openAlert({
+					title: "Please enter a title for the schedule",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 
 		const token = await user?.getIdToken(true);
 
@@ -318,15 +324,30 @@ export default function ScheduleEditor({
 				</Popover.Portal>
 			</Popover.Root>
 
-			<button
-				type="button"
-				className="bg-blue-500 text-white rounded-lg p-2"
-				onClick={() => {
-					getSelfSchedules();
-				}}
-			>
-				<ReloadIcon />
-			</button>
+			<Tooltip.Provider delayDuration={400}>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<button
+							type="button"
+							className="bg-blue-500 text-white rounded-lg p-2"
+							onClick={() => {
+								getSelfSchedules();
+							}}
+						>
+							<ReloadIcon />
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white dark:bg-neutral-800 px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+							sideOffset={5}
+						>
+							Refresh schedules and events
+							<Tooltip.Arrow className="fill-white dark:fill-neutral-800" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		</div>
 	);
 }
