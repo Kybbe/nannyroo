@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import {
 import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
 import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
+import { openAlert } from "@/store/slices/alertSlice";
 import styles from "./EditEventPopover.module.scss";
 import ColorPicker from "../ColorPicker";
 
@@ -126,7 +126,13 @@ export default function EditEventPopover({
 
 			// check if start is before end
 			if (startFormatted > endFormatted) {
-				alert("Start date must be before end date");
+				dispatch(
+					openAlert({
+						title: "Start date must be before end date",
+						alertType: "error",
+						alertOrConfirm: "alert",
+					})
+				);
 				return;
 			}
 
@@ -242,11 +248,23 @@ export default function EditEventPopover({
 								defaultValue={data.title}
 								onChange={e => {
 									if (!e.target.value) {
-										alert("Title cannot be empty");
+										dispatch(
+											openAlert({
+												title: "Title cannot be empty",
+												alertType: "error",
+												alertOrConfirm: "alert",
+											})
+										);
 										return;
 									}
 									if (e.target.value.length > 25) {
-										alert("Title must be less than 25 characters");
+										dispatch(
+											openAlert({
+												title: "Title must be less than 25 characters",
+												alertType: "error",
+												alertOrConfirm: "alert",
+											})
+										);
 										return;
 									}
 									setData({ ...data, title: e.target.value });

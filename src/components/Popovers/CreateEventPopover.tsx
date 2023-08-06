@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as Popover from "@radix-ui/react-popover";
 import FullCalendar from "@fullcalendar/react";
@@ -12,6 +11,7 @@ import { useAppSelector } from "@/hooks/redux/useAppSelector";
 import { formatDate, formatTime } from "@/helpers/frontend/DateFormat";
 import saveToDatabase from "@/helpers/frontend/saveToDb";
 import { useAuthContext } from "@/context/AuthContext";
+import { openAlert } from "@/store/slices/alertSlice";
 import styles from "./CreateEventPopover.module.scss";
 import ColorPicker from "../ColorPicker";
 import ScheduleSwitcher from "../ScheduleSwitcher";
@@ -134,8 +134,13 @@ export default function CreateEventPopover({
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function createRecurringEvent(event: any) {
 		if (event.daysOfWeek?.length === 0) {
-			// eslint-disable-next-line no-alert
-			alert("Please select at least one day of the week");
+			dispatch(
+				openAlert({
+					title: "Please select at least one day of the week",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return null;
 		}
 
@@ -175,8 +180,13 @@ export default function CreateEventPopover({
 
 		// check if start is before end
 		if (startFormatted > endFormatted) {
-			// eslint-disable-next-line no-alert
-			alert("Start date must be before end date");
+			dispatch(
+				openAlert({
+					title: "Start date must be before end date",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return null;
 		}
 
@@ -210,20 +220,44 @@ export default function CreateEventPopover({
 			return;
 		}
 		if (!title) {
-			alert("Please enter a title");
+			dispatch(
+				openAlert({
+					title: "Please enter a title",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 		if (title.length > 25) {
-			alert("Title must be less than 25 characters");
+			dispatch(
+				openAlert({
+					title: "Title must be less than 25 characters",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 
 		if (!parentScheduleId) {
-			alert("Please select a schedule");
+			dispatch(
+				openAlert({
+					title: "Please select a schedule",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 		if (!checkIfScheduleEditable(parentScheduleId)) {
-			alert("You do not have permission to edit this schedule");
+			dispatch(
+				openAlert({
+					title: "You do not have permission to edit this schedule",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 

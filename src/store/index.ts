@@ -12,6 +12,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import uiSlice from "./slices/uiSlice";
 import scheduleSlice from "./slices/scheduleSlice";
+import alertSlice from "./slices/alertSlice";
 
 const persistConfig = {
 	key: "root",
@@ -28,6 +29,7 @@ export const store = configureStore({
 	reducer: {
 		ui: persistedUiReducer,
 		schedule: persistedScheduleReducer,
+		alert: alertSlice.reducer,
 	},
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware({

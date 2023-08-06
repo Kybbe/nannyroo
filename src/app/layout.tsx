@@ -4,6 +4,7 @@ import { Nunito } from "next/font/google";
 import Header from "@/components/Layout/Header";
 import { ReduxStoreProvider } from "@/components/Layout/ReduxStoreProvider";
 import { AuthContextProvider } from "@/context/AuthContext";
+import AlertDialog from "@/components/Layout/AlertDialog";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
@@ -28,6 +29,8 @@ export default function RootLayout({
 					<AuthContextProvider>
 						<Header />
 						{children}
+
+						<AlertDialog />
 					</AuthContextProvider>
 				</ReduxStoreProvider>
 			</body>

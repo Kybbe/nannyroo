@@ -12,6 +12,8 @@ import { useState } from "react";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import signUp, { signIn } from "@/helpers/frontend/firebase/Auth";
 import { useAuthContext } from "@/context/AuthContext";
+import { useAppDispatch } from "@/hooks/redux/useAppDispatch";
+import { openAlert } from "@/store/slices/alertSlice";
 
 const provider = new GoogleAuthProvider();
 
@@ -26,12 +28,18 @@ export default function Profile() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<AuthError | null>(null);
 	const user = useAuthContext();
+	const dispatch = useAppDispatch();
 
 	const loginRegister = async () => {
 		if (loading) return;
 		if (!loginInfo.email || !loginInfo.password) {
-			// eslint-disable-next-line no-alert
-			alert("Please enter an email and password");
+			dispatch(
+				openAlert({
+					title: "Please enter an email and password",
+					alertType: "error",
+					alertOrConfirm: "alert",
+				})
+			);
 			return;
 		}
 
