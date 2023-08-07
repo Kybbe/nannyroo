@@ -31,6 +31,9 @@ export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
 	const eventStore = useAppSelector(state => state.schedule.activeSchedule);
 	const allSchedules = useAppSelector(state => state.schedule.schedules);
+	const activeScheduleType = useAppSelector(
+		state => state.schedule.activeScheduleType
+	);
 	const flattenedSchedules = [
 		...allSchedules.ownerSchedules,
 		...allSchedules.sharedSchedules,
@@ -234,9 +237,15 @@ export default function Schedule() {
 			end,
 			allDay,
 			title,
-			parentScheduleId,
 			extendedProps: { completed },
 		} = event;
+		const storeEvent = flattenedEvents?.find(e => e.id === id);
+		const parentSchedule = flattenedSchedules.find(
+			s => s._id === storeEvent?.parentScheduleId
+		);
+		const isReadOnly = parentSchedule?.users.sharingWith.some(
+			u => u.userEmail === user?.email && u.permissions === "read"
+		);
 		return (
 			<>
 				<Checkbox.Root
@@ -256,8 +265,6 @@ export default function Schedule() {
 					</Checkbox.Indicator>
 				</Checkbox.Root>
 
-				<p>{flattenedSchedules.find(s => s._id === parentScheduleId)?.title}</p>
-
 				{allDay ? (
 					<p className="text-xs" style={completed ? { opacity: 0.5 } : {}}>
 						All day
@@ -275,9 +282,21 @@ export default function Schedule() {
 						)}
 					</>
 				)}
-				<b className="h-fit" style={completed ? { opacity: 0.5 } : {}}>
+				<b
+					className="h-fit break-all"
+					style={completed ? { opacity: 0.5 } : {}}
+				>
 					{title}
 				</b>
+				{activeScheduleType === "all" && (
+					<p
+						className="h-fit break-all"
+						style={completed ? { opacity: 0.5 } : {}}
+					>
+						- {parentSchedule?.title}
+					</p>
+				)}
+				{isReadOnly && <span>(cannot edit)</span>}
 			</>
 		);
 	};
