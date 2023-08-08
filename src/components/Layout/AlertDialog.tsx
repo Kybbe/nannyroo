@@ -23,12 +23,10 @@ export default function AlertDialog() {
 		}
 		if (alertInfo !== null) {
 			window.addEventListener("keydown", handleKeyDown);
-			console.log("added event listener");
 		}
 
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
-			console.log("removed event listener");
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [alertInfo]);
@@ -39,9 +37,20 @@ export default function AlertDialog() {
 			open={alertInfo !== null}
 			onOpenChange={close}
 		>
-			<ReactAlertDialog.Portal>
+			<ReactAlertDialog.Portal
+				onClick={e => {
+					e.stopPropagation();
+					e.preventDefault();
+				}}
+			>
 				<ReactAlertDialog.Overlay className="bg-[#00000085] data-[state=open]:animate-overlayShow fixed inset-0 z-10" />
-				<ReactAlertDialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] z-20 max-h-[85vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white dark:bg-neutral-800 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
+				<ReactAlertDialog.Content
+					onClick={e => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
+					className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] z-20 max-h-[85vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white dark:bg-neutral-800 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none AlertDialog"
+				>
 					<ReactAlertDialog.Title
 						className={`m-0 text-[17px] font-medium ${
 							alertInfo?.alertType === "error" && "text-red-500"
@@ -70,7 +79,12 @@ export default function AlertDialog() {
 						)}
 						<ReactAlertDialog.Action asChild>
 							<button
-								onClick={alertInfo?.onConfirm}
+								onClick={e => {
+									e.preventDefault();
+									e.stopPropagation();
+									if (alertInfo?.onConfirm) alertInfo.onConfirm();
+									close();
+								}}
 								type="button"
 								className={`${
 									alertInfo?.alertType === "error" &&

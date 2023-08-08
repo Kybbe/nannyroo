@@ -283,6 +283,13 @@ export default function ScheduleEditor({
 				</Popover.Trigger>
 				<Popover.Portal>
 					<Popover.Content
+						onInteractOutside={e => {
+							const target = e.target as HTMLElement;
+							if (target.classList.contains("AlertDialog")) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
 						className="rounded p-4 bg-neutral-100 dark:bg-neutral-700 shadow-md z-10 flex gap-1 flex-col"
 						sideOffset={5}
 					>

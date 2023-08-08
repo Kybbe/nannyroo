@@ -136,6 +136,13 @@ export default function EditSchedulePopover({ children }: Props) {
 			<Popover.Trigger asChild>{children}</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content
+					onInteractOutside={e => {
+						const target = e.target as HTMLElement;
+						if (target.classList.contains("AlertDialog")) {
+							e.preventDefault();
+							e.stopPropagation();
+						}
+					}}
 					className={`${styles.PopoverContent} rounded p-4 bg-neutral-100 dark:bg-neutral-800 shadow-md z-10`}
 					sideOffset={5}
 				>
