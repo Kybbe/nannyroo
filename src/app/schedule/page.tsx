@@ -10,12 +10,7 @@ import {
 	EventClickArg,
 } from "@fullcalendar/core";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import {
-	CheckIcon,
-	Cross1Icon,
-	Cross2Icon,
-	Pencil1Icon,
-} from "@radix-ui/react-icons";
+import { CheckIcon, Cross2Icon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import { getAuth } from "firebase/auth";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
