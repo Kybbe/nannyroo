@@ -10,7 +10,12 @@ import {
 	EventClickArg,
 } from "@fullcalendar/core";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { CheckIcon } from "@radix-ui/react-icons";
+import {
+	CheckIcon,
+	Cross1Icon,
+	Cross2Icon,
+	Pencil1Icon,
+} from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import { getAuth } from "firebase/auth";
 import { useAppSelector } from "@/hooks/redux/useAppSelector";
@@ -26,6 +31,7 @@ import UseGetAllWriteableEvents from "@/hooks/UseGetAllWriteableEvents";
 import { useAuthContext } from "@/context/AuthContext";
 import ReadEventPopover from "@/components/Popovers/ReadEventPopover";
 import { openAlert } from "@/store/slices/alertSlice";
+import Loader from "@/components/Loader";
 
 export default function Schedule() {
 	const calendarRef = useRef<FullCalendar>(null);
@@ -95,8 +101,9 @@ export default function Schedule() {
 	}, []);
 
 	const user = useAuthContext();
-	if (!user) {
-		router.push("/");
+	if (!user || !user.emailVerified) {
+		router.push("/profile");
+		return <Loader loading>Redirecting...</Loader>;
 	}
 
 	const createEvent = (selectInfo: DateSelectArg) => {
@@ -265,6 +272,19 @@ export default function Schedule() {
 					</Checkbox.Indicator>
 				</Checkbox.Root>
 
+				{isReadOnly && (
+					<>
+						<Pencil1Icon
+							style={completed ? { opacity: 0.5 } : {}}
+							className="absolute top-0 right-0 z-[3] w-5 h-5 text-neutral-600"
+						/>
+						<Cross2Icon
+							style={completed ? { opacity: 0.5 } : {}}
+							className="absolute top-0 right-0 z-[4] w-5 h-5 text-red-400 rotate-45"
+						/>
+					</>
+				)}
+
 				{allDay ? (
 					<p className="text-xs" style={completed ? { opacity: 0.5 } : {}}>
 						All day
@@ -296,7 +316,6 @@ export default function Schedule() {
 						- {parentSchedule?.title}
 					</p>
 				)}
-				{isReadOnly && <span>(cannot edit)</span>}
 			</>
 		);
 	};
