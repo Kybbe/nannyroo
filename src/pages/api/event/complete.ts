@@ -79,7 +79,10 @@ async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
 				if (ev.id === event.id)
 					return {
 						...ev,
-						completed: event.extendedProps?.completed,
+						extendedProps: {
+							...ev.extendedProps,
+							completed: event.extendedProps?.completed,
+						},
 					};
 				return ev;
 			}),
