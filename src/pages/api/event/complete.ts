@@ -72,9 +72,7 @@ async function updateEvent(req: NextApiRequest, res: NextApiResponse) {
 		const event = req.body as ScheduleEvent;
 
 		const newTarget = {
-			_id: target._id,
-			title: target.title,
-			users: target.users,
+			...target,
 			events: target.events.map(ev => {
 				if (ev.id === event.id)
 					return {
